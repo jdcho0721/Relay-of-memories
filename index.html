@@ -27,27 +27,6 @@
             letter-spacing: 2px;
         }
 
-        /* AI 마이크 버튼 스타일 추가 */
-        #ai-mic-btn {
-            position: absolute; top: 25px; right: 25px;
-            padding: 12px 24px; 
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white; border: none; border-radius: 50px; cursor: pointer;
-            font-family: 'Gowun Batang', serif; font-weight: bold; font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.3s;
-            z-index: 100;
-            display: flex; align-items: center; gap: 10px;
-        }
-        #ai-mic-btn.listening {
-            animation: pulse 1.5s infinite;
-            background: #27ae60;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(39, 174, 96, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
-        }
-
         #guide-btn {
             position: absolute; top: 25px; left: 25px;
             padding: 12px 24px; 
@@ -117,6 +96,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* 친구 초점(Focus) 테두리 수정: 더 굵고 명확한 색상 적용 */
         .photo-card:hover, .photo-card:focus { 
             transform: translateY(-5px); 
             border-color: #ff3d00;
@@ -154,9 +134,6 @@
 <header role="banner">
     <h1 class="game-title">추억의 릴레이</h1>
     <button id="guide-btn" onclick="toggleGuide(true)" aria-haspopup="dialog"> 게임 이용 방법</button>
-    <button id="ai-mic-btn" onclick="toggleAIChat()" aria-label="친구와 실시간 대화하기">
-        <span id="mic-icon">🎤</span> <span id="mic-text">친구와 대화하기</span>
-    </button>
 </header>
 
 <div id="guide-overlay" onclick="toggleGuide(false)" role="dialog" aria-labelledby="guide-title" aria-modal="true">
@@ -171,9 +148,9 @@
         
         <div class="guide-box">
             <h2> 이용 방법</h2>
-            <p>1.  <b>친구 선택:</b> 화면의 카드를 터치하거나 마우스로 클릭하세요.</p>
-            <p>2. <b>실시간 대화:</b> 오른쪽 상단의 <b>'친구와 대화하기'</b>를 누르고 친구의 이름을 부르며 말을 걸어보세요. (예: "재형아, 오늘 기분 어때?")</p>
-            <p>3. <b>꿈의 소리:</b> 카드를 길게 누르거나 더블 클릭하면 친구의 소리가 들립니다.</p>
+            <p>1.  <b>친구 선택:</b> 화면의 카드를 <b>터치</b>하거나 <b>마우스로 클릭</b>하세요. 키보드 사용 시 <b>방향키(←↑→↓)</b>로 자유롭게 이동할 수 있습니다.</p>
+            <p>2. <b>인사 및 릴레이 시작:</b> 카드를 <b>한 번 짧게 터치(클릭)</b>하거나 <b>Enter 키</b>를 누르면 친구의 소개를 듣고 단짝 찾기 미션을 시작합니다.</p>
+            <p>3. <b>꿈의 소리 듣기:</b> 카드를 <b>0.5초 이상 길게 누르거나(Long Press)</b>, 빠르게 <b>두 번 터치(더블 클릭)</b>, 또는 <b>Space(스페이스) 키</b>를 누르면 해당 친구의 특별한 소리가 재생됩니다.</p>
         </div>
 
         <footer id="author-section">
@@ -182,6 +159,7 @@
                 <strong>조준동 (趙浚東) 교수</strong><br>
                 성균관대학교 정보통신대학 전자전기공학부<br>
                 Email: jdcho07@gmail.com<br>
+
                 <span style="font-size: 0.8rem; opacity: 0.8;">© 2026 추억의 릴레이 Project. All rights reserved.</span>
             </div>
         </footer>
@@ -200,27 +178,27 @@
 <main id="album-frame">
     <div id="album-container" role="list" aria-label="졸업생 사진 앨범">
         <div class="photo-card" id="card-재형" role="button" tabindex="0" aria-label="재형 학생의 카드">
-            <div class="character-img" id="img-재형" role="img" aria-label="갈색 머리에 주황색 헤어밴드를 쓴 운동선수 지망생 재형"></div>
+            <div class="character-img" id="img-재형" role="img" aria-label="갈색 머리에 주황색과 흰색이 섞인 운동용 헤어밴드를 쓰고 있습니다. 얼굴에는 주근깨가 있으며, 운동 중임을 나타내는 땀방울이 송골송골 맺혀 있습니다."></div>
             <div class="name-tag" aria-hidden="true">재형</div>
         </div>
         <div class="photo-card" id="card-은우" role="button" tabindex="0" aria-label="은우 학생의 카드">
-            <div class="character-img" id="img-은우" role="img" aria-label="안경을 쓴 단정한 모습의 작가 지망생 은우"></div>
+            <div class="character-img" id="img-은우" role="img" aria-label="짙은 남색의 단정한 머리 모양에 지적인 인상을 주는 갈색 뿔테 안경을 쓰고 있습니다."></div>
             <div class="name-tag" aria-hidden="true">은우</div>
         </div>
         <div class="photo-card" id="card-혜란" role="button" tabindex="0" aria-label="혜란 학생의 카드">
-            <div class="character-img" id="img-혜란" role="img" aria-label="똑 단발머리를 한 조향사 지망생 혜란"></div>
+            <div class="character-img" id="img-혜란" role="img" aria-label="짙은 갈색의 똑 단발머리를 하고 있으며, 눈매가 날카롭게 올라가 있습니다. 뺨은 상기된 듯 붉게 물들어 있습니다."></div>
             <div class="name-tag" aria-hidden="true">혜란</div>
         </div>
         <div class="photo-card" id="card-민수" role="button" tabindex="0" aria-label="민수 학생의 카드">
-            <div class="character-img" id="img-민수" role="img" aria-label="귀여운 인상의 성우 지망생 민수"></div>
+            <div class="character-img" id="img-민수" role="img" aria-label="단정한 갈색 머리에 갈색 뿔테 안경을 쓴 귀여운 남학생 캐릭터입니다."></div>
             <div class="name-tag" aria-hidden="true">민수</div>
         </div>
         <div class="photo-card" id="card-지우" role="button" tabindex="0" aria-label="지우 학생의 카드">
-            <div class="character-img" id="img-지우" role="img" aria-label="양 갈래 머리에 분홍 머리띠를 한 정원사 지망생 지우"></div>
+            <div class="character-img" id="img-지우" role="img" aria-label="짙은 남색 머리를 양 갈래로 둥글게 땋아 내렸으며, 머리 위에는 분홍색 머리띠를 쓰고 있습니다."></div>
             <div class="name-tag" aria-hidden="true">지우</div>
         </div>
         <div class="photo-card" id="card-소연" role="button" tabindex="0" aria-label="소연 학생의 카드">
-            <div class="character-img" id="img-소연" role="img" aria-label="하트 점이 매력적인 이야기꾼 지망생 소연"></div>
+            <div class="character-img" id="img-소연" role="img" aria-label="보라색이 감도는 분홍색 단발머리에 눈매가 선명한 소녀입니다. 오른쪽 뺨에는 작고 귀여운 빨간색 하트 점이 있고, 왼쪽 뺨은 발그레하게 표현되어 있습니다."></div>
             <div class="name-tag" aria-hidden="true">소연</div>
         </div>
     </div>
@@ -231,77 +209,17 @@
     <div id="message-box">추억이 담긴 앨범에서 친구를 선택해 주세요.</div>
 </footer>
 
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
 <script>
-    // --- [AI 기능 설정] ---
-    const GEMINI_API_KEY = "AIzaSyBbH5AkN4me8WVjSE-3FC_oGPszxbio9XY"; // 실제 API 키를 입력하세요.
-    let recognition;
-    let isListening = false;
-    let lastSelectedCharacter = "재형"; // 기본 대화 상대
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js');
+    });
+  }
 
-    // 음성 인식 초기화
-    if ('webkitSpeechRecognition' in window) {
-        recognition = new webkitSpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'ko-KR';
-
-        recognition.onresult = (event) => {
-            const userText = event.results[0][0].transcript;
-            updateUI("Listening", `"${userText}"... 인식 중`, 1.0);
-            processAIConversation(userText);
-        };
-
-        recognition.onend = () => {
-            isListening = false;
-            document.getElementById('ai-mic-btn').classList.remove('listening');
-            document.getElementById('mic-text').innerText = "친구와 대화하기";
-        };
-    }
-
-    async function processAIConversation(text) {
-        // 문장에서 친구 이름이 포함되어 있는지 확인하여 대화 상대 변경
-        for (let name in friendData) {
-            if (text.includes(name)) lastSelectedCharacter = name;
-        }
-
-        const prompt = `너는 전북맹아학교 졸업생이자 ${friendData[lastSelectedCharacter].role}인 '${lastSelectedCharacter}'야. 
-        사용자는 네 학교 친구야. 아주 따뜻하고 친근하게 대답해줘. 
-        답변은 시각 장애 학생이 듣기 좋게 짧고 명확하게 한두 문장으로 해줘. 질문: ${text}`;
-
-        try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            });
-            const data = await response.json();
-            const aiReply = data.candidates[0].content.parts[0].text;
-            
-            updateUI(lastSelectedCharacter, aiReply, friendData[lastSelectedCharacter].pitch);
-        } catch (error) {
-            console.error("AI 에러:", error);
-            updateUI("Error", "친구와 연결이 잠시 끊겼어. 다시 시도해볼래?", 1.0);
-        }
-    }
-
-    function toggleAIChat() {
-        if (!recognition) {
-            alert("이 브라우저는 음성 인식을 지원하지 않습니다.");
-            return;
-        }
-        if (isListening) {
-            recognition.stop();
-        } else {
-            stopAllAudio();
-            recognition.start();
-            isListening = true;
-            document.getElementById('ai-mic-btn').classList.add('listening');
-            document.getElementById('mic-text').innerText = "말씀하세요...";
-            updateUI("Mic On", "친구의 이름을 부르며 대화해보세요.", 1.0);
-        }
-    }
-
-    // --- [기존 게임 로직] ---
     const friendData = {
         '재형': { role: "운동선수", pitch: 0.8, next: "은우" },
         '은우': { role: "작가", pitch: 0.9, next: "지우" },
@@ -335,15 +253,17 @@
 
     cards.forEach(card => {
         const name = card.id.replace('card-', '');
+
         card.addEventListener('click', (e) => {
             if (e.pointerType === 'touch') return;
+            
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastClickTime;
+            
             if (tapLength < 300 && tapLength > 0) {
                 playDreamSound(name);
                 e.preventDefault();
             } else {
-                lastSelectedCharacter = name; // 대화 상대 업데이트
                 executeSingleClickAction(name);
             }
             lastClickTime = currentTime;
@@ -363,20 +283,25 @@
             if (!isLongPress) {
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastClickTime;
+                
                 if (tapLength < 300 && tapLength > 0) {
                     playDreamSound(name);
                 } else {
-                    lastSelectedCharacter = name;
                     executeSingleClickAction(name);
                 }
                 lastClickTime = currentTime;
             }
             e.preventDefault(); 
         });
+
+        card.addEventListener('touchmove', () => {
+            clearTimeout(touchTimer);
+        }, { passive: true });
     });
 
     function executeSingleClickAction(name) {
         stopAllAudio();
+        
         if (isRelayMode && name === targetFriend) {
             completeRelay(name);
         } else if (!isRelayMode) {
@@ -402,7 +327,9 @@
         targetFriend = friendData[name].next;
         const myRole = friendData[name].role;
         const msg = `나는 멋진 ${myRole}를 꿈꾸고 있어. 나의 단짝 ${targetFriend}를 찾아줄래?`;
+
         updateUI("Relay", msg, friendData[name].pitch);
+
         document.querySelectorAll('.photo-card').forEach(c => c.classList.remove('target'));
         const targetCard = document.getElementById(`card-${targetFriend}`);
         if (targetCard) targetCard.classList.add('target');
@@ -438,6 +365,25 @@
             currentPlayingAudio = null;
         }
     }
+
+    document.addEventListener('keydown', (e) => {
+        if (currentIndex === -1) { currentIndex = 0; cards[currentIndex].focus(); return; }
+        let newIndex = currentIndex;
+        switch(e.key) {
+            case 'ArrowRight': newIndex = (currentIndex + 1) % cards.length; e.preventDefault(); break;
+            case 'ArrowLeft': newIndex = (currentIndex - 1 + cards.length) % cards.length; e.preventDefault(); break;
+            case 'ArrowDown': if (currentIndex + cols < cards.length) newIndex = currentIndex + cols; e.preventDefault(); break;
+            case 'ArrowUp': if (currentIndex - cols >= 0) newIndex = currentIndex - cols; e.preventDefault(); break;
+            case 'Enter': executeSingleClickAction(cards[currentIndex].id.replace('card-', '')); break;
+            case ' ': case 'Space': e.preventDefault(); playDreamSound(cards[currentIndex].id.replace('card-', '')); break;
+            case 'Tab': e.preventDefault(); break;
+        }
+        if (newIndex !== currentIndex) { currentIndex = newIndex; cards[currentIndex].focus(); }
+    });
+
+    cards.forEach((card, index) => {
+        card.addEventListener('focus', () => { currentIndex = index; });
+    });
 
     function playDreamSound(name) {
         stopAllAudio();
