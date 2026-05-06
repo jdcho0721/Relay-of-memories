@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>전북맹아학교: 추억의 릴레이</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Pretendard:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --frame: #8d6e63; 
+            --gold: #ffd700; 
+            --accent: #e67e22;
+            --soft-bg: #fff9f0;
+        }
+        
+        body { 
+            margin: 0; background: #2c3e50; color: #333;
+            font-family: 'Pretendard', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; 
+        }
+
+        .game-title {
+            font-family: 'Gowun Batang', serif;
+            font-size: 2.8rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+        }
+
+        #guide-btn {
+            position: absolute; top: 25px; left: 25px;
+            padding: 12px 24px; 
+            background: linear-gradient(135deg, #8d6e63, #5d4037);
+            color: white; border: none; border-radius: 50px; cursor: pointer;
+            font-family: 'Gowun Batang', serif; font-weight: bold; font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.3s;
+            z-index: 100;
+        }
+
+        #guide-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 1000; justify-content: center; align-items: center;
+        }
+        
+        #guide-content {
+            width: 550px; background: var(--soft-bg); padding: 40px; border-radius: 30px; position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease-out;
+            font-family: 'Gowun Batang', serif;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-btn {
+            position: absolute; top: 20px; right: 25px; font-size: 2rem; cursor: pointer; color: #8d6e63;
+        }
+
+        #guide-content h1 { 
+            margin-top: 0; color: #4a3e36; font-size: 1.8rem; text-align: center;
+            margin-bottom: 25px; border-bottom: 2px dashed #d7ccc8; padding-bottom: 15px;
+        }
+        
+        .guide-box { 
+            background: white; padding: 18px; border-radius: 15px; 
+            margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #efebe9;
+        }
+        
+        .guide-box h2 { font-size: 1.1rem; margin-top: 0; color: var(--accent); margin-bottom: 8px; }
+        .guide-box p { color: #5d4037; line-height: 1.6; margin: 0; font-size: 0.95rem; }
+        .highlight { color: #d35400; font-weight: bold; background: #fff3e0; padding: 2px 4px; border-radius: 4px; }
+
+        #author-section {
+            margin-top: 25px; padding-top: 20px; border-top: 1px solid #d7ccc8;
+            text-align: center;
+        }
+        #author-section h3 { font-size: 1rem; color: #8d6e63; margin-bottom: 10px; }
+        .author-info { font-size: 0.9rem; color: #6d4c41; line-height: 1.5; }
+
+        #album-frame { padding: 25px; background: #4a3e36; border-radius: 20px; box-shadow: 0 40px 80px rgba(0,0,0,0.6); }
+        #album-container {
+            width: 950px; height: 580px; border: 15px solid var(--frame); background: #fff;
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);
+            padding: 40px; gap: 30px; border-radius: 10px;
+        }
+        
+        .photo-card {
+            background: #fff; border: 1px solid #eee; border-radius: 10px;
+            display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; transition: 0.3s; padding: 15px;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .photo-card:hover, .photo-card:focus { transform: translateY(-5px); border-color: var(--accent); }
+        .photo-card.target { border: 5px solid var(--gold); animation: blink 1s infinite; background: #fffdf0; }
+        
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        
+        .character-img { width: 160px; height: 160px; border-radius: 10px; background-size: cover; background-position: center; border: 1px solid #f5f5f5; }
+        #img-재형 { background-image: url('재형.png'); }
+        #img-은우 { background-image: url('은우.png'); }
+        #img-혜란 { background-image: url('혜란.png'); }
+        #img-민수 { background-image: url('민수.png'); }
+        #img-지우 { background-image: url('지우.png'); }
+        #img-소연 { background-image: url('소연.png'); }
+
+        .name-tag { margin-top: 15px; font-weight: bold; font-size: 1.4rem; color: #4a3e36; font-family: 'Gowun Batang', serif; }
+        
+        #info-panel {
+            margin-top: 30px; width: 950px; display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 30px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; color: white;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+        }
+        #stage-indicator { font-size: 1.1rem; color: var(--gold); font-weight: bold; }
+        #message-box { font-size: 1.3rem; font-family: 'Gowun Batang', serif; color: #fff; text-align: right; }
+        
+        audio { display: none; }
+    </style>
+</head>
+<body>
+
+<header role="banner">
+    <h1 class="game-title">추억의 릴레이</h1>
+    <button id="guide-btn" onclick="toggleGuide(true)" aria-haspopup="dialog">📖 게임 이용 방법</button>
+</header>
+
+<div id="guide-overlay" onclick="toggleGuide(false)" role="dialog" aria-labelledby="guide-title" aria-modal="true">
+    <div id="guide-content" onclick="event.stopPropagation()">
+        <span class="close-btn" onclick="toggleGuide(false)" role="button" aria-label="도움말 닫기">&times;</span>
+        <h1 id="guide-title">추억의 소리 릴레이</h1>
+        
+        <div class="guide-box">
+            <h2> 게임 소개</h2>
+            <p>졸업생 친구들이 소중한 추억을 나누기 위해 모였습니다. 목소리를 따라 단짝을 찾아주고 그들의 <span class="highlight">꿈이 담긴 소리</span>를 들어보세요.</p>
+        </div>
+        
+        <div class="guide-box">
+            <h2>🎧 이용 방법</h2>
+            <p>1. <b>화살표 키(←↑→↓):</b> 카드를 이동하여 선택합니다.</p>
+            <p>2. <b>Enter 또는 짧은 클릭:</b> 인사말을 듣고 지목된 단짝 친구를 찾아 확인합니다.</p>
+            <p>3. <b>Space 또는 길게 누르기(Long Press):</b> 해당 친구의 <span class="highlight">꿈의 소리(MP3)</span>를 재생합니다.</p>
+        </div>
+
+        <footer id="author-section">
+            <h3> 저자 소개</h3>
+            <div class="author-info">
+                <strong>조준동 (趙浚東) 교수[cite: 1]</strong><br>
+                성균관대학교 정보통신대학 전자전기공학부<br>
+                <span style="font-size: 0.8rem; opacity: 0.8;">© 2026 추억의 릴레이 Project. All rights reserved.</span>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<div id="audio-container" aria-hidden="true">
+    <audio id="audio-재형" src="재형m.mp3" preload="auto"></audio>
+    <audio id="audio-은우" src="은우m.mp3" preload="auto"></audio>
+    <audio id="audio-혜란" src="혜란m.mp3" preload="auto"></audio>
+    <audio id="audio-민수" src="민수m.mp3" preload="auto"></audio>
+    <audio id="audio-지우" src="지우m.mp3" preload="auto"></audio>
+    <audio id="audio-소연" src="소연m.mp3" preload="auto"></audio>
+</div>
+
+<main id="album-frame">
+    <div id="album-container" role="list" aria-label="졸업생 사진 앨범">
+        <!-- 모바일 롱프레스를 위해 onclick 대신 이벤트 리스너를 사용하므로 onclick 속성을 제거했습니다 -->
+        <div class="photo-card" id="card-재형" role="button" tabindex="0" aria-label="재형 학생의 카드">
+            <div class="character-img" id="img-재형" role="img" aria-label="갈색 머리에 주황색과 흰색이 섞인 운동용 헤어밴드를 쓰고 있습니다. 얼굴에는 주근깨가 있으며, 운동 중임을 나타내는 땀방울이 송골송골 맺혀 있습니다."></div>
+            <div class="name-tag" aria-hidden="true">재형</div>
+        </div>
+        <div class="photo-card" id="card-은우" role="button" tabindex="0" aria-label="은우 학생의 카드">
+            <div class="character-img" id="img-은우" role="img" aria-label="짙은 남색의 단정한 머리 모양에 지적인 인상을 주는 갈색 뿔테 안경을 쓰고 있습니다."></div>
+            <div class="name-tag" aria-hidden="true">은우</div>
+        </div>
+        <div class="photo-card" id="card-혜란" role="button" tabindex="0" aria-label="혜란 학생의 카드">
+            <div class="character-img" id="img-혜란" role="img" aria-label="짙은 갈색의 똑 단발머리를 하고 있으며, 눈매가 날카롭게 올라가 있습니다. 뺨은 상기된 듯 붉게 물들어 있습니다."></div>
+            <div class="name-tag" aria-hidden="true">혜란</div>
+        </div>
+        <div class="photo-card" id="card-민수" role="button" tabindex="0" aria-label="민수 학생의 카드">
+            <div class="character-img" id="img-민수" role="img" aria-label="단정한 갈색 머리에 갈색 뿔테 안경을 쓴 귀여운 남학생 캐릭터입니다."></div>
+            <div class="name-tag" aria-hidden="true">민수</div>
+        </div>
+        <div class="photo-card" id="card-지우" role="button" tabindex="0" aria-label="지우 학생의 카드">
+            <div class="character-img" id="img-지우" role="img" aria-label="짙은 남색 머리를 양 갈래로 둥글게 땋아 내렸으며, 머리 위에는 분홍색 머리띠를 쓰고 있습니다."></div>
+            <div class="name-tag" aria-hidden="true">지우</div>
+        </div>
+        <div class="photo-card" id="card-소연" role="button" tabindex="0" aria-label="소연 학생의 카드">
+            <div class="character-img" id="img-소연" role="img" aria-label="보라색이 감도는 분홍색 단발머리에 눈매가 선명한 소녀입니다. 오른쪽 뺨에는 작고 귀여운 빨간색 하트 점이 있고, 왼쪽 뺨은 발그레하게 표현되어 있습니다."></div>
+            <div class="name-tag" aria-hidden="true">소연</div>
+        </div>
+    </div>
+</main>
+
+<footer id="info-panel" aria-live="polite">
+    <div id="stage-indicator">Waiting</div>
+    <div id="message-box">추억이 담긴 앨범에서 친구를 선택해 주세요.</div>
+</footer>
+
+<!-- PWA 설정 연결 -->
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<script>
+
+// 서비스 워커 등록
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js');
+    });
+  }
+
+    const friendData = {
+        '재형': { role: "운동선수", pitch: 0.8, next: "은우" },
+        '은우': { role: "작가", pitch: 0.9, next: "지우" },
+        '지우': { role: "정원사", pitch: 1.1, next: "민수" },
+        '민수': { role: "성우", pitch: 0.7, next: "혜란" },
+        '혜란': { role: "조향사", pitch: 1.2, next: "소연" },
+        '소연': { role: "이야기꾼", pitch: 1.3, next: "재형" }
+    };
+
+    const responseMemories = {
+        '재형-은우': "재형아! 나 여기 있어. 맞아, 우리 축구 중계하면서 정말 많이 웃었지? 찾아줘서 고마워!",
+        '은우-지우': "은우야! 나 불렀니? 네 소설 속에 내 정원이 나온다니 정말 감동이야. 찾아줘서 고마워!",
+        '지우-민수': "지우야! 네 꽃들만큼이나 예쁜 기타 소리를 들려줄게. 함께 합주하던 기억이 소중해.",
+        '민수-혜란': "민수야! 네 목소리만큼 향기로운 소식을 가져왔어. 우리 우정을 기억하며 찾아줘서 고마워.",
+        '혜란-소연': "혜란아! 네 향기 덕분에 내 이야기 보따리가 더 풍성해졌어. 정말 고마워! 반가워요.",
+        '소연-재형': "소연아! 나 여기 있어! 네 이야기 속 주인공처럼 멋진 선수가 될게. 나를 찾아줘서 고마워."
+    };
+
+    let isRelayMode = false;
+    let selectedSpeaker = "";
+    let targetFriend = "";
+    let currentPlayingAudio = null;
+    let currentIndex = -1;
+
+    const cards = Array.from(document.querySelectorAll('.photo-card'));
+    const cols = 3;
+
+    // 모바일 롱프레스(길게 누르기) 및 일반 클릭 통합 제어
+    let touchTimer = null;
+    let isLongPress = false;
+
+    cards.forEach(card => {
+        const name = card.id.replace('card-', '');
+
+        // 1. 마우스 클릭 (PC용)
+        card.addEventListener('click', (e) => {
+            // 터치 이벤트가 발생한 직후의 클릭은 무시 (중복 실행 방지)
+            if (e.pointerType === 'touch') return;
+            executeSingleClickAction(name);
+        });
+
+        // 2. 터치 이벤트 (모바일용)
+        card.addEventListener('touchstart', (e) => {
+            isLongPress = false;
+            touchTimer = setTimeout(() => {
+                isLongPress = true;
+                playDreamSound(name); // 0.5초 이상 누르면 꿈의 소리 재생
+                if (navigator.vibrate) navigator.vibrate(50); 
+            }, 500);
+        }, { passive: true });
+
+        card.addEventListener('touchend', (e) => {
+            clearTimeout(touchTimer);
+            if (!isLongPress) {
+                // 짧게 터치했을 때만 실행
+                executeSingleClickAction(name);
+            }
+            e.preventDefault(); 
+        });
+
+        card.addEventListener('touchmove', () => {
+            clearTimeout(touchTimer); // 터치한 채로 움직이면 취소
+        }, { passive: true });
+    });
+
+    function executeSingleClickAction(name) {
+        stopAllAudio();
+        
+        if (isRelayMode && name === targetFriend) {
+            completeRelay(name);
+        } else if (!isRelayMode) {
+            const introMsg = `이 사진은 ${name}의 사진입니다.`;
+            updateUI("Guide", introMsg, 1.0, () => {
+                setTimeout(() => {
+                    const imgElement = document.getElementById(`img-${name}`);
+                    const desc = imgElement ? imgElement.getAttribute('aria-label') : "";
+                    const selfIntro = ` ${desc}`;
+                    updateUI("Self Intro", selfIntro, friendData[name].pitch, () => {
+                        setTimeout(() => {
+                            startRelayMission(name);
+                        }, 800);
+                    });
+                }, 800);
+            });
+        }
+    }
+
+    function startRelayMission(name) {
+        isRelayMode = true;
+        selectedSpeaker = name;
+        targetFriend = friendData[name].next;
+        const myRole = friendData[name].role;
+        const msg = `나는 멋진 ${myRole}를 꿈꾸고 있어. 나의 단짝 ${targetFriend}를 찾아줄래?`;
+
+        updateUI("Relay", msg, friendData[name].pitch);
+
+        document.querySelectorAll('.photo-card').forEach(c => c.classList.remove('target'));
+        const targetCard = document.getElementById(`card-${targetFriend}`);
+        if (targetCard) targetCard.classList.add('target');
+    }
+
+    function completeRelay(name) {
+        const memoryKey = `${selectedSpeaker}-${name}`;
+        const mainMsg = responseMemories[memoryKey] || "찾아줘서 고마워!";
+        updateUI("Success", mainMsg, friendData[name].pitch);
+        document.getElementById(`card-${targetFriend}`).classList.remove('target');
+        isRelayMode = false;
+    }
+
+    function updateUI(stage, text, pitch, onEndCallback) {
+        document.getElementById('stage-indicator').innerText = stage;
+        document.getElementById('message-box').innerText = text;
+        speak(text, pitch, onEndCallback);
+    }
+
+    function speak(text, pitch, onEndCallback) {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'ko-KR';
+        utter.pitch = pitch || 1.0;
+        if (onEndCallback) utter.onend = onEndCallback;
+        window.speechSynthesis.speak(utter);
+    }
+
+    function stopAllAudio() {
+        window.speechSynthesis.cancel();
+        if (currentPlayingAudio) {
+            currentPlayingAudio.pause();
+            currentPlayingAudio.currentTime = 0;
+            currentPlayingAudio = null;
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (currentIndex === -1) { currentIndex = 0; cards[currentIndex].focus(); return; }
+        let newIndex = currentIndex;
+        switch(e.key) {
+            case 'ArrowRight': newIndex = (currentIndex + 1) % cards.length; e.preventDefault(); break;
+            case 'ArrowLeft': newIndex = (currentIndex - 1 + cards.length) % cards.length; e.preventDefault(); break;
+            case 'ArrowDown': if (currentIndex + cols < cards.length) newIndex = currentIndex + cols; e.preventDefault(); break;
+            case 'ArrowUp': if (currentIndex - cols >= 0) newIndex = currentIndex - cols; e.preventDefault(); break;
+            case 'Enter': executeSingleClickAction(cards[currentIndex].id.replace('card-', '')); break;
+            case ' ': case 'Space': e.preventDefault(); playDreamSound(cards[currentIndex].id.replace('card-', '')); break;
+            case 'Tab': e.preventDefault(); break;
+        }
+        if (newIndex !== currentIndex) { currentIndex = newIndex; cards[currentIndex].focus(); }
+    });
+
+    cards.forEach((card, index) => {
+        card.addEventListener('focus', () => { currentIndex = index; });
+    });
+
+    function playDreamSound(name) {
+        stopAllAudio();
+        const audio = document.getElementById(`audio-${name}`);
+        if (audio) {
+            currentPlayingAudio = audio;
+            audio.play().catch(e => console.log("재생 오류:", e));
+            document.getElementById('message-box').innerText = `${name}의 꿈의 소리를 재생합니다.`;
+            document.getElementById('stage-indicator').innerText = "Dreaming";
+        }
+    }
+
+    function toggleGuide(show) {
+        document.getElementById('guide-overlay').style.display = show ? 'flex' : 'none';
+    }
+</script>
+</body>
+</html>
