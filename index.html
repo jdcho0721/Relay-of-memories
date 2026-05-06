@@ -60,26 +60,26 @@
         }
 
         #guide-content h1 { 
-            margin-top: 0; color: #4a3e36; font-size: 1.8rem; text-align: center;
+            margin-top: 0; color: #4a3e36; font-size: 2rem; text-align: center;
             margin-bottom: 25px; border-bottom: 2px dashed #d7ccc8; padding-bottom: 15px;
         }
         
         .guide-box { 
-            background: white; padding: 18px; border-radius: 15px; 
+            background: white; padding: 20px; border-radius: 15px; 
             margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             border: 1px solid #efebe9;
         }
         
-        .guide-box h2 { font-size: 1.1rem; margin-top: 0; color: var(--accent); margin-bottom: 8px; }
-        .guide-box p { color: #5d4037; line-height: 1.6; margin: 0; font-size: 0.95rem; }
+        .guide-box h2 { font-size: 1.3rem; margin-top: 0; color: var(--accent); margin-bottom: 10px; }
+        .guide-box p { color: #2c3e50; line-height: 1.8; margin: 0; font-size: 1.1rem; font-weight: 500; }
         .highlight { color: #d35400; font-weight: bold; background: #fff3e0; padding: 2px 4px; border-radius: 4px; }
 
         #author-section {
             margin-top: 25px; padding-top: 20px; border-top: 1px solid #d7ccc8;
             text-align: center;
         }
-        #author-section h3 { font-size: 1rem; color: #8d6e63; margin-bottom: 10px; }
-        .author-info { font-size: 0.9rem; color: #6d4c41; line-height: 1.5; }
+        #author-section h3 { font-size: 1.1rem; color: #8d6e63; margin-bottom: 10px; }
+        .author-info { font-size: 1rem; color: #6d4c41; line-height: 1.6; }
 
         #album-frame { padding: 25px; background: #4a3e36; border-radius: 20px; box-shadow: 0 40px 80px rgba(0,0,0,0.6); }
         #album-container {
@@ -95,7 +95,15 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .photo-card:hover, .photo-card:focus { transform: translateY(-5px); border-color: var(--accent); }
+
+        /* 친구 초점(Focus) 테두리 수정: 더 굵고 명확한 색상 적용 */
+        .photo-card:hover, .photo-card:focus { 
+            transform: translateY(-5px); 
+            border-color: #ff3d00;
+            box-shadow: 0 0 0 8px #fff, 0 0 0 15px #ff3d00;
+            z-index: 10;
+        }
+
         .photo-card.target { border: 5px solid var(--gold); animation: blink 1s infinite; background: #fffdf0; }
         
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
@@ -140,9 +148,9 @@
         
         <div class="guide-box">
             <h2> 이용 방법</h2>
-            <p>1.  카드를 손가락으로 터치하여 선책합니다. 또는 <b>화살표 키(←↑→↓):</b> 카드를 이동하여 선택합니다. </p>
-            <p>2. <b>Enter 또는 짧은 클릭 또는 터치:</b> 인사말을 듣고 지목된 단짝 친구를 찾아 확인합니다.</p>
-            <p>3. <b>Space 또는 길게 누르기(Long Press):</b> 해당 친구의 <span class="highlight">꿈의 소리(MP3)</span>를 재생합니다.</p>
+            <p>1.  <b>친구 선택:</b> 화면의 카드를 <b>터치</b>하거나 <b>마우스로 클릭</b>하세요. 키보드 사용 시 <b>방향키(←↑→↓)</b>로 자유롭게 이동할 수 있습니다.</p>
+            <p>2. <b>인사 및 릴레이 시작:</b> 카드를 <b>한 번 짧게 터치(클릭)</b>하거나 <b>Enter 키</b>를 누르면 친구의 소개를 듣고 단짝 찾기 미션을 시작합니다.</p>
+            <p>3. <b>꿈의 소리 듣기:</b> 카드를 <b>0.5초 이상 길게 누르거나(Long Press)</b>, 빠르게 <b>두 번 터치(더블 클릭)</b>, 또는 <b>Space(스페이스) 키</b>를 누르면 해당 친구의 특별한 소리가 재생됩니다.</p>
         </div>
 
         <footer id="author-section">
@@ -150,6 +158,8 @@
             <div class="author-info">
                 <strong>조준동 (趙浚東) 교수</strong><br>
                 성균관대학교 정보통신대학 전자전기공학부<br>
+                Email: jdcho07@gmail.com<br>
+
                 <span style="font-size: 0.8rem; opacity: 0.8;">© 2026 추억의 릴레이 Project. All rights reserved.</span>
             </div>
         </footer>
@@ -167,7 +177,6 @@
 
 <main id="album-frame">
     <div id="album-container" role="list" aria-label="졸업생 사진 앨범">
-        <!-- 모바일 롱프레스를 위해 onclick 대신 이벤트 리스너를 사용하므로 onclick 속성을 제거했습니다 -->
         <div class="photo-card" id="card-재형" role="button" tabindex="0" aria-label="재형 학생의 카드">
             <div class="character-img" id="img-재형" role="img" aria-label="갈색 머리에 주황색과 흰색이 섞인 운동용 헤어밴드를 쓰고 있습니다. 얼굴에는 주근깨가 있으며, 운동 중임을 나타내는 땀방울이 송골송골 맺혀 있습니다."></div>
             <div class="name-tag" aria-hidden="true">재형</div>
@@ -200,14 +209,11 @@
     <div id="message-box">추억이 담긴 앨범에서 친구를 선택해 주세요.</div>
 </footer>
 
-<!-- PWA 설정 연결 -->
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 
 <script>
-
-// 서비스 워커 등록
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('service-worker.js');
@@ -241,26 +247,33 @@
     const cards = Array.from(document.querySelectorAll('.photo-card'));
     const cols = 3;
 
-    // 모바일 롱프레스(길게 누르기) 및 일반 클릭 통합 제어
     let touchTimer = null;
     let isLongPress = false;
+    let lastClickTime = 0;
 
     cards.forEach(card => {
         const name = card.id.replace('card-', '');
 
-        // 1. 마우스 클릭 (PC용)
         card.addEventListener('click', (e) => {
-            // 터치 이벤트가 발생한 직후의 클릭은 무시 (중복 실행 방지)
             if (e.pointerType === 'touch') return;
-            executeSingleClickAction(name);
+            
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastClickTime;
+            
+            if (tapLength < 300 && tapLength > 0) {
+                playDreamSound(name);
+                e.preventDefault();
+            } else {
+                executeSingleClickAction(name);
+            }
+            lastClickTime = currentTime;
         });
 
-        // 2. 터치 이벤트 (모바일용)
         card.addEventListener('touchstart', (e) => {
             isLongPress = false;
             touchTimer = setTimeout(() => {
                 isLongPress = true;
-                playDreamSound(name); // 0.5초 이상 누르면 꿈의 소리 재생
+                playDreamSound(name); 
                 if (navigator.vibrate) navigator.vibrate(50); 
             }, 500);
         }, { passive: true });
@@ -268,14 +281,21 @@
         card.addEventListener('touchend', (e) => {
             clearTimeout(touchTimer);
             if (!isLongPress) {
-                // 짧게 터치했을 때만 실행
-                executeSingleClickAction(name);
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastClickTime;
+                
+                if (tapLength < 300 && tapLength > 0) {
+                    playDreamSound(name);
+                } else {
+                    executeSingleClickAction(name);
+                }
+                lastClickTime = currentTime;
             }
             e.preventDefault(); 
         });
 
         card.addEventListener('touchmove', () => {
-            clearTimeout(touchTimer); // 터치한 채로 움직이면 취소
+            clearTimeout(touchTimer);
         }, { passive: true });
     });
 
