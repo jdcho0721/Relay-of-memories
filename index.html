@@ -24,6 +24,7 @@
             color: var(--gold);
             margin-bottom: 20px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-align: center;
             letter-spacing: 2px;
         }
 
@@ -72,7 +73,6 @@
         
         .guide-box h2 { font-size: 1.3rem; margin-top: 0; color: var(--accent); margin-bottom: 10px; }
         .guide-box p { color: #2c3e50; line-height: 1.8; margin: 0; font-size: 1.1rem; font-weight: 500; }
-        .highlight { color: #d35400; font-weight: bold; background: #fff3e0; padding: 2px 4px; border-radius: 4px; }
 
         #author-section {
             margin-top: 25px; padding-top: 20px; border-top: 1px solid #d7ccc8;
@@ -93,10 +93,8 @@
             display: flex; flex-direction: column; align-items: center;
             cursor: pointer; transition: 0.3s; padding: 15px;
             outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 친구 초점(Focus) 테두리 수정: 더 굵고 명확한 색상 적용 */
         .photo-card:hover, .photo-card:focus { 
             transform: translateY(-5px); 
             border-color: #ff3d00;
@@ -124,42 +122,65 @@
             backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
         }
         #stage-indicator { font-size: 1.1rem; color: var(--gold); font-weight: bold; }
-        #message-box { font-size: 1.3rem; font-family: 'Gowun Batang', serif; color: #fff; text-align: right; }
+        #message-box { font-size: 1.3rem; font-family: 'Gowun Batang', serif; color: #fff; text-align: right; flex: 1; margin-left: 20px; }
         
-        audio { display: none; }
+        .chatbot-header {
+            width: 800px; background: #1A362D; border: 2px solid var(--gold);
+            border-radius: 15px; padding: 15px 25px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 20px; color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .mic-section { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .mic-btn {
+            width: 50px; height: 50px; background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--gold); border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: 0.3s;
+        }
+        .mic-btn.active { background: var(--accent); box-shadow: 0 0 15px var(--accent); }
+        .wave-container { display: flex; gap: 3px; align-items: center; height: 20px; }
+        .wave-bar { width: 3px; height: 5px; background: #fff; }
+        .active .wave-bar { animation: wave-anim 1s infinite ease-in-out; }
+        @keyframes wave-anim { 0%, 100% { height: 5px; } 50% { height: 20px; } }
+        #chat-status { font-size: 1.1rem; color: var(--soft-bg); flex: 1; }
     </style>
 </head>
 <body>
 
 <header role="banner">
     <h1 class="game-title">추억의 릴레이</h1>
-    <button id="guide-btn" onclick="toggleGuide(true)" aria-haspopup="dialog"> 게임 이용 방법</button>
+    <button id="guide-btn" onclick="toggleGuide(true)">게임 이용 방법</button>
+
+    <div class="chatbot-header" id="chatbot-ui">
+        <div class="mic-section">
+            <button class="mic-btn" id="mic-trigger" onclick="toggleSpeechRecognition()">
+                <div class="wave-container">
+                    <div class="wave-bar" style="animation-delay: 0.1s"></div>
+                    <div class="wave-bar" style="animation-delay: 0.2s"></div>
+                    <div class="wave-bar" style="animation-delay: 0.3s"></div>
+                </div>
+            </button>
+            <span style="font-size: 0.7rem; color: var(--gold);">V키 클릭</span>
+        </div>
+        <div id="chat-status">"민수를 찾아줘"라고 말해보세요.</div>
+    </div>
 </header>
 
-<div id="guide-overlay" onclick="toggleGuide(false)" role="dialog" aria-labelledby="guide-title" aria-modal="true">
+<div id="guide-overlay" onclick="toggleGuide(false)">
     <div id="guide-content" onclick="event.stopPropagation()">
-        <span class="close-btn" onclick="toggleGuide(false)" role="button" aria-label="도움말 닫기">&times;</span>
-        <h1 id="guide-title">추억의 소리 릴레이</h1>
-        
+        <span class="close-btn" onclick="toggleGuide(false)">&times;</span>
+        <h1>추억의 소리 릴레이</h1>
         <div class="guide-box">
-            <h2> 게임 소개</h2>
-            <p>졸업생 친구들이 소중한 추억을 나누기 위해 모였습니다. 목소리를 따라 단짝을 찾아주고 그들의 <span class="highlight">꿈이 담긴 소리</span>를 들어보세요.</p>
+            <h2>이용 방법</h2>
+            <p>1. <b>친구 선택:</b> 카드 클릭 또는 방향키 이동</p>
+            <p>2. <b>인사:</b> 카드 클릭 또는 Enter (소개 및 미션)</p>
+            <p>3. <b>꿈의 소리:</b> 더블 클릭 또는 Space</p>
+            <p>4. <b>챗봇:</b> V 키를 눌러 "이름 + 꿈/단짝/위치" 질문</p>
         </div>
-        
-        <div class="guide-box">
-            <h2> 이용 방법</h2>
-            <p>1.  <b>친구 선택:</b> 화면의 카드를 <b>터치</b>하거나 <b>마우스로 클릭</b>하세요. 키보드 사용 시 <b>방향키(←↑→↓)</b>로 자유롭게 이동할 수 있습니다.</p>
-            <p>2. <b>인사 및 릴레이 시작:</b> 카드를 <b>한 번 짧게 터치(클릭)</b>하거나 <b>Enter 키</b>를 누르면 친구의 소개를 듣고 단짝 찾기 미션을 시작합니다.</p>
-            <p>3. <b>꿈의 소리 듣기:</b> 카드를 <b>0.5초 이상 길게 누르거나(Long Press)</b>, 빠르게 <b>두 번 터치(더블 클릭)</b>, 또는 <b>Space(스페이스) 키</b>를 누르면 해당 친구의 특별한 소리가 재생됩니다.</p>
-        </div>
-
         <footer id="author-section">
-            <h3> 저자 소개</h3>
+            <h3>저자 소개</h3>
             <div class="author-info">
                 <strong>조준동 (趙浚東) 교수</strong><br>
                 성균관대학교 정보통신대학 전자전기공학부<br>
-                Email: jdcho07@gmail.com<br>
-
                 <span style="font-size: 0.8rem; opacity: 0.8;">© 2026 추억의 릴레이 Project. All rights reserved.</span>
             </div>
         </footer>
@@ -176,229 +197,298 @@
 </div>
 
 <main id="album-frame">
-    <div id="album-container" role="list" aria-label="졸업생 사진 앨범">
-        <div class="photo-card" id="card-재형" role="button" tabindex="0" aria-label="재형 학생의 카드">
-            <div class="character-img" id="img-재형" role="img" aria-label="갈색 머리에 주황색과 흰색이 섞인 운동용 헤어밴드를 쓰고 있습니다. 얼굴에는 주근깨가 있으며, 운동 중임을 나타내는 땀방울이 송골송골 맺혀 있습니다."></div>
-            <div class="name-tag" aria-hidden="true">재형</div>
+    <div id="album-container" role="list">
+        <div class="photo-card" id="card-재형" role="button" tabindex="0">
+            <div class="character-img" id="img-재형" aria-label="운동선수가 꿈인 늠름한 모습입니다."></div>
+            <div class="name-tag">재형</div>
         </div>
-        <div class="photo-card" id="card-은우" role="button" tabindex="0" aria-label="은우 학생의 카드">
-            <div class="character-img" id="img-은우" role="img" aria-label="짙은 남색의 단정한 머리 모양에 지적인 인상을 주는 갈색 뿔테 안경을 쓰고 있습니다."></div>
-            <div class="name-tag" aria-hidden="true">은우</div>
+        <div class="photo-card" id="card-은우" role="button" tabindex="0">
+            <div class="character-img" id="img-은우" aria-label="안경을 쓴 지적인 모습입니다."></div>
+            <div class="name-tag">은우</div>
         </div>
-        <div class="photo-card" id="card-혜란" role="button" tabindex="0" aria-label="혜란 학생의 카드">
-            <div class="character-img" id="img-혜란" role="img" aria-label="짙은 갈색의 똑 단발머리를 하고 있으며, 눈매가 날카롭게 올라가 있습니다. 뺨은 상기된 듯 붉게 물들어 있습니다."></div>
-            <div class="name-tag" aria-hidden="true">혜란</div>
+        <div class="photo-card" id="card-혜란" role="button" tabindex="0">
+            <div class="character-img" id="img-혜란" aria-label="단발머리에 밝게 웃고 있습니다."></div>
+            <div class="name-tag">혜란</div>
         </div>
-        <div class="photo-card" id="card-민수" role="button" tabindex="0" aria-label="민수 학생의 카드">
-            <div class="character-img" id="img-민수" role="img" aria-label="단정한 갈색 머리에 갈색 뿔테 안경을 쓴 귀여운 남학생 캐릭터입니다."></div>
-            <div class="name-tag" aria-hidden="true">민수</div>
+        <div class="photo-card" id="card-민수" role="button" tabindex="0">
+            <div class="character-img" id="img-민수" aria-label="갈색 안경을 쓴 귀여운 모습입니다."></div>
+            <div class="name-tag">민수</div>
         </div>
-        <div class="photo-card" id="card-지우" role="button" tabindex="0" aria-label="지우 학생의 카드">
-            <div class="character-img" id="img-지우" role="img" aria-label="짙은 남색 머리를 양 갈래로 둥글게 땋아 내렸으며, 머리 위에는 분홍색 머리띠를 쓰고 있습니다."></div>
-            <div class="name-tag" aria-hidden="true">지우</div>
+        <div class="photo-card" id="card-지우" role="button" tabindex="0">
+            <div class="character-img" id="img-지우" aria-label="양갈래 머리에 분홍색 리본을 했습니다."></div>
+            <div class="name-tag">지우</div>
         </div>
-        <div class="photo-card" id="card-소연" role="button" tabindex="0" aria-label="소연 학생의 카드">
-            <div class="character-img" id="img-소연" role="img" aria-label="보라색이 감도는 분홍색 단발머리에 눈매가 선명한 소녀입니다. 오른쪽 뺨에는 작고 귀여운 빨간색 하트 점이 있고, 왼쪽 뺨은 발그레하게 표현되어 있습니다."></div>
-            <div class="name-tag" aria-hidden="true">소연</div>
+        <div class="photo-card" id="card-소연" role="button" tabindex="0">
+            <div class="character-img" id="img-소연" aria-label="하트 점이 매력적입니다."></div>
+            <div class="name-tag">소연</div>
         </div>
     </div>
 </main>
 
-<footer id="info-panel" aria-live="polite">
+<footer id="info-panel">
     <div id="stage-indicator">Waiting</div>
     <div id="message-box">추억이 담긴 앨범에서 친구를 선택해 주세요.</div>
 </footer>
 
-<link rel="manifest" href="manifest.json">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js');
-    });
-  }
+/* --- 데이터 설정 --- */
+const friendData = {
+    '재형': { role: "운동선수", dream: "멋진 축구선수", bestFriend: "은우", pitch: 0.8, next: "은우" },
+    '은우': { role: "작가", dream: "베스트셀러 소설가", bestFriend: "지우", pitch: 0.9, next: "지우" },
+    '지우': { role: "정원사", dream: "아름다운 정원을 가꾸는 정원사", bestFriend: "민수", pitch: 1.1, next: "민수" },
+    '민수': { role: "성우", dream: "감동을 주는 성우", bestFriend: "혜란", pitch: 0.7, next: "혜란" },
+    '혜란': { role: "조향사", dream: "행복한 향기를 만드는 조향사", bestFriend: "소연", pitch: 1.2, next: "소연" },
+    '소연': { role: "이야기꾼", dream: "재미있는 이야기를 들려주는 이야기꾼", bestFriend: "재형", pitch: 1.3, next: "재형" }
+};
 
-    const friendData = {
-        '재형': { role: "운동선수", pitch: 0.8, next: "은우" },
-        '은우': { role: "작가", pitch: 0.9, next: "지우" },
-        '지우': { role: "정원사", pitch: 1.1, next: "민수" },
-        '민수': { role: "성우", pitch: 0.7, next: "혜란" },
-        '혜란': { role: "조향사", pitch: 1.2, next: "소연" },
-        '소연': { role: "이야기꾼", pitch: 1.3, next: "재형" }
-    };
+const responseMemories = {
+    '재형-은우': "재형아! 나 여기 있어. 맞아, 우리 축구 중계하면서 정말 많이 웃었지? 찾아줘서 고마워!",
+    '은우-지우': "은우야! 나 불렀니? 네 소설 속에 내 정원이 나온다니 정말 감동이야. 찾아줘서 고마워!",
+    '지우-민수': "지우야! 네 꽃들만큼이나 예쁜 기타 소리를 들려줄께. 함께 합주하던 기억이 소중해.",
+    '민수-혜란': "민수야! 네 목소리만큼 향기로운 소식을 가져왔어. 우리 우정을 기억하며 찾아줘서 고마워.",
+    '혜란-소연': "혜란아! 네 향기 덕분에 내 이야기 보따리가 더 풍성해졌어. 정말 고마워! 반가워요.",
+    '소연-재형': "소연아! 나 여기 있어! 네 이야기 속 주인공처럼 멋진 선수가 될께. 나를 찾아줘서 고마워."
+};
 
-    const responseMemories = {
-        '재형-은우': "재형아! 나 여기 있어. 맞아, 우리 축구 중계하면서 정말 많이 웃었지? 찾아줘서 고마워!",
-        '은우-지우': "은우야! 나 불렀니? 네 소설 속에 내 정원이 나온다니 정말 감동이야. 찾아줘서 고마워!",
-        '지우-민수': "지우야! 네 꽃들만큼이나 예쁜 기타 소리를 들려줄게. 함께 합주하던 기억이 소중해.",
-        '민수-혜란': "민수야! 네 목소리만큼 향기로운 소식을 가져왔어. 우리 우정을 기억하며 찾아줘서 고마워.",
-        '혜란-소연': "혜란아! 네 향기 덕분에 내 이야기 보따리가 더 풍성해졌어. 정말 고마워! 반가워요.",
-        '소연-재형': "소연아! 나 여기 있어! 네 이야기 속 주인공처럼 멋진 선수가 될게. 나를 찾아줘서 고마워."
-    };
+let isRelayMode = false;
+let selectedSpeaker = "";
+let targetFriend = "";
+let currentPlayingAudio = null;
+let currentIndex = -1;
+const cards = Array.from(document.querySelectorAll('.photo-card'));
+const cols = 3;
 
-    let isRelayMode = false;
-    let selectedSpeaker = "";
-    let targetFriend = "";
-    let currentPlayingAudio = null;
-    let currentIndex = -1;
+/* --- 음성 및 소리 제어 (단일화된 핵심 함수) --- */
+function speak(text, pitch, onEndCallback) {
+    window.speechSynthesis.cancel(); // 이전 음성 즉시 중단
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ko-KR';
+    utter.pitch = pitch || 1.0;
+    if (onEndCallback) utter.onend = onEndCallback;
+    window.speechSynthesis.speak(utter);
+}
 
-    const cards = Array.from(document.querySelectorAll('.photo-card'));
-    const cols = 3;
+function updateUI(stage, text, pitch, onEndCallback) {
+    document.getElementById('stage-indicator').innerText = stage;
+    document.getElementById('message-box').innerText = text;
+    speak(text, pitch, onEndCallback);
+}
 
+function stopAllAudio() {
+    window.speechSynthesis.cancel();
+    if (currentPlayingAudio) {
+        currentPlayingAudio.pause();
+        currentPlayingAudio.currentTime = 0;
+        currentPlayingAudio = null;
+    }
+}
+
+function playDreamSound(name) {
+    stopAllAudio();
+    const audio = document.getElementById(`audio-${name}`);
+    if (audio) {
+        currentPlayingAudio = audio;
+        audio.load(); // 모바일 재생 안정성을 위해 로드 추가
+        audio.play().catch((err) => {
+            console.log("재생 실패:", err);
+            speak("소리 재생을 위해 화면을 한 번 더 터치해 주세요.");
+        });
+        document.getElementById('message-box').innerText = `${name}의 꿈의 소리를 재생합니다.`;
+        document.getElementById('stage-indicator').innerText = "Dreaming";
+    }
+}
+
+/* --- 게임 로직 --- */
+function executeSingleClickAction(name) {
+    stopAllAudio();
+    
+    if (isRelayMode && name === targetFriend) {
+        completeRelay(name);
+    } else {
+        isRelayMode = false; 
+        // 1단계: 이름 안내
+        updateUI("Guide", `이 사진은 ${name}의 사진입니다.`, 1.0, () => {
+            setTimeout(() => {
+                const imgElement = document.getElementById(`img-${name}`);
+                
+                // [수정 포인트] 
+                // getAttribute가 null을 반환할 경우 ""(빈 문자열)을 대입하여 
+                // TTS가 "널"이라고 읽는 것을 방지합니다.
+                const desc = (imgElement && imgElement.getAttribute('aria-label')) || "";
+                
+                // 2단계: 사진 묘사 (desc가 빈 문자열이면 아무 소리 없이 다음 단계로 이동)
+                updateUI("Self Intro", desc, friendData[name].pitch, () => {
+                    setTimeout(() => startRelayMission(name), 800);
+                });
+            }, 800);
+        });
+    }
+}
+function startRelayMission(name) {
+    isRelayMode = true;
+    selectedSpeaker = name;
+    targetFriend = friendData[name].next;
+    const msg = `나는 멋진 ${friendData[name].role}를 꿈꾸고 있어. 나의 단짝 ${targetFriend}를 찾아줄래?`;
+    updateUI("Relay", msg, friendData[name].pitch);
+    cards.forEach(c => c.classList.remove('target'));
+    document.getElementById(`card-${targetFriend}`).classList.add('target');
+}
+
+function completeRelay(name) {
+    const memoryKey = `${selectedSpeaker}-${name}`;
+    updateUI("Success", responseMemories[memoryKey] || "반가워!", friendData[name].pitch);
+    cards.forEach(c => c.classList.remove('target'));
+    isRelayMode = false;
+}
+
+/* --- 이벤트 제어 (클릭/터치 및 롱 프레스 통합) --- */
+cards.forEach((card, index) => {
+    const name = card.id.replace('card-', '');
     let touchTimer = null;
     let isLongPress = false;
-    let lastClickTime = 0;
 
-    cards.forEach(card => {
-        const name = card.id.replace('card-', '');
-
-        card.addEventListener('click', (e) => {
-            if (e.pointerType === 'touch') return;
-            
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastClickTime;
-            
-            if (tapLength < 300 && tapLength > 0) {
-                playDreamSound(name);
-                e.preventDefault();
-            } else {
-                executeSingleClickAction(name);
-            }
-            lastClickTime = currentTime;
-        });
-
-        card.addEventListener('touchstart', (e) => {
+    // 1. 일반 클릭 및 터치 (인사 및 미션)
+    card.addEventListener('click', (e) => {
+        // 롱 프레스가 방금 발생했다면 클릭 동작 무시
+        if (isLongPress) {
             isLongPress = false;
-            touchTimer = setTimeout(() => {
-                isLongPress = true;
-                playDreamSound(name); 
-                if (navigator.vibrate) navigator.vibrate(50); 
-            }, 500);
-        }, { passive: true });
-
-        card.addEventListener('touchend', (e) => {
-            clearTimeout(touchTimer);
-            if (!isLongPress) {
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastClickTime;
-                
-                if (tapLength < 300 && tapLength > 0) {
-                    playDreamSound(name);
-                } else {
-                    executeSingleClickAction(name);
-                }
-                lastClickTime = currentTime;
-            }
-            e.preventDefault(); 
-        });
-
-        card.addEventListener('touchmove', () => {
-            clearTimeout(touchTimer);
-        }, { passive: true });
-    });
-
-    function executeSingleClickAction(name) {
-        stopAllAudio();
+            return;
+        }
         
-        if (isRelayMode && name === targetFriend) {
-            completeRelay(name);
-        } else if (!isRelayMode) {
-            const introMsg = `이 사진은 ${name}의 사진입니다.`;
-            updateUI("Guide", introMsg, 1.0, () => {
-                setTimeout(() => {
-                    const imgElement = document.getElementById(`img-${name}`);
-                    const desc = imgElement ? imgElement.getAttribute('aria-label') : "";
-                    const selfIntro = ` ${desc}`;
-                    updateUI("Self Intro", selfIntro, friendData[name].pitch, () => {
-                        setTimeout(() => {
-                            startRelayMission(name);
-                        }, 800);
-                    });
-                }, 800);
-            });
+        // 모바일 브라우저 음성 잠금 해제 (User Gesture 대응)
+        if (window.speechSynthesis.speaking === false) {
+            const silentUtter = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(silentUtter);
         }
-    }
-
-    function startRelayMission(name) {
-        isRelayMode = true;
-        selectedSpeaker = name;
-        targetFriend = friendData[name].next;
-        const myRole = friendData[name].role;
-        const msg = `나는 멋진 ${myRole}를 꿈꾸고 있어. 나의 단짝 ${targetFriend}를 찾아줄래?`;
-
-        updateUI("Relay", msg, friendData[name].pitch);
-
-        document.querySelectorAll('.photo-card').forEach(c => c.classList.remove('target'));
-        const targetCard = document.getElementById(`card-${targetFriend}`);
-        if (targetCard) targetCard.classList.add('target');
-    }
-
-    function completeRelay(name) {
-        const memoryKey = `${selectedSpeaker}-${name}`;
-        const mainMsg = responseMemories[memoryKey] || "찾아줘서 고마워!";
-        updateUI("Success", mainMsg, friendData[name].pitch);
-        document.getElementById(`card-${targetFriend}`).classList.remove('target');
-        isRelayMode = false;
-    }
-
-    function updateUI(stage, text, pitch, onEndCallback) {
-        document.getElementById('stage-indicator').innerText = stage;
-        document.getElementById('message-box').innerText = text;
-        speak(text, pitch, onEndCallback);
-    }
-
-    function speak(text, pitch, onEndCallback) {
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'ko-KR';
-        utter.pitch = pitch || 1.0;
-        if (onEndCallback) utter.onend = onEndCallback;
-        window.speechSynthesis.speak(utter);
-    }
-
-    function stopAllAudio() {
-        window.speechSynthesis.cancel();
-        if (currentPlayingAudio) {
-            currentPlayingAudio.pause();
-            currentPlayingAudio.currentTime = 0;
-            currentPlayingAudio = null;
-        }
-    }
-
-    document.addEventListener('keydown', (e) => {
-        if (currentIndex === -1) { currentIndex = 0; cards[currentIndex].focus(); return; }
-        let newIndex = currentIndex;
-        switch(e.key) {
-            case 'ArrowRight': newIndex = (currentIndex + 1) % cards.length; e.preventDefault(); break;
-            case 'ArrowLeft': newIndex = (currentIndex - 1 + cards.length) % cards.length; e.preventDefault(); break;
-            case 'ArrowDown': if (currentIndex + cols < cards.length) newIndex = currentIndex + cols; e.preventDefault(); break;
-            case 'ArrowUp': if (currentIndex - cols >= 0) newIndex = currentIndex - cols; e.preventDefault(); break;
-            case 'Enter': executeSingleClickAction(cards[currentIndex].id.replace('card-', '')); break;
-            case ' ': case 'Space': e.preventDefault(); playDreamSound(cards[currentIndex].id.replace('card-', '')); break;
-            case 'Tab': e.preventDefault(); break;
-        }
-        if (newIndex !== currentIndex) { currentIndex = newIndex; cards[currentIndex].focus(); }
+        
+        executeSingleClickAction(name);
     });
 
-    cards.forEach((card, index) => {
-        card.addEventListener('focus', () => { currentIndex = index; });
+    // 2. 더블 클릭 (PC에서 꿈의 소리 재생)
+    card.addEventListener('dblclick', () => {
+        playDreamSound(name);
     });
 
-    function playDreamSound(name) {
-        stopAllAudio();
-        const audio = document.getElementById(`audio-${name}`);
-        if (audio) {
-            currentPlayingAudio = audio;
-            audio.play().catch(e => console.log("재생 오류:", e));
-            document.getElementById('message-box').innerText = `${name}의 꿈의 소리를 재생합니다.`;
-            document.getElementById('stage-indicator').innerText = "Dreaming";
+    // 3. 롱 프레스 구현 (모바일에서 꿈의 소리 재생)
+    card.addEventListener('touchstart', (e) => {
+        isLongPress = false;
+        // 500ms 이상 누르면 롱 프레스로 간주
+        touchTimer = setTimeout(() => {
+            isLongPress = true;
+            playDreamSound(name);
+        }, 500); 
+    }, { passive: true });
+
+    card.addEventListener('touchend', () => {
+        if (touchTimer) {
+            clearTimeout(touchTimer);
+            touchTimer = null;
+        }
+    });
+
+    card.addEventListener('touchmove', () => {
+        if (touchTimer) {
+            clearTimeout(touchTimer);
+            touchTimer = null;
+        }
+    });
+
+    // 4. 포커스 제어
+    card.addEventListener('focus', () => currentIndex = index);
+});
+
+
+document.addEventListener('keydown', (e) => {
+    if (currentIndex === -1) { currentIndex = 0; cards[0].focus(); return; }
+    const name = cards[currentIndex].id.replace('card-', '');
+    let newIndex = currentIndex;
+
+    switch(e.key) {
+        case 'ArrowRight': newIndex = (currentIndex + 1) % cards.length; break;
+        case 'ArrowLeft': newIndex = (currentIndex - 1 + cards.length) % cards.length; break;
+        case 'ArrowDown': if (currentIndex + cols < cards.length) newIndex = currentIndex + cols; break;
+        case 'ArrowUp': if (currentIndex - cols >= 0) newIndex = currentIndex - cols; break;
+        case 'Enter': executeSingleClickAction(name); break;
+        case ' ': e.preventDefault(); playDreamSound(name); break;
+        case 'v': case 'V': toggleSpeechRecognition(); break;
+    }
+    if (newIndex !== currentIndex) { currentIndex = newIndex; cards[currentIndex].focus(); }
+});
+
+/* --- 음성 인식 (AI 챗봇) --- */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isRecognizing = false;
+
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'ko-KR';
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+        isRecognizing = true;
+        document.getElementById('mic-trigger').classList.add('active');
+        document.getElementById('chat-status').innerText = "듣고 있습니다...";
+    };
+
+    recognition.onresult = (event) => {
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+        }
+        if (finalTranscript) handleVoiceCommand(finalTranscript);
+    };
+
+    recognition.onend = () => {
+        isRecognizing = true; // 시각적 피드백 유지
+        setTimeout(() => {
+            isRecognizing = false;
+            document.getElementById('mic-trigger').classList.remove('active');
+        }, 500);
+    };
+}
+
+function toggleSpeechRecognition() {
+    if (!recognition) return alert("음성 인식을 지원하지 않는 브라우저입니다.");
+    isRecognizing ? recognition.stop() : recognition.start();
+}
+
+
+function toggleGuide(show) { document.getElementById('guide-overlay').style.display = show ? 'flex' : 'none'; }
+
+function handleVoiceCommand(cmd) {
+    const cleanCmd = cmd.replace(/\s+/g, "");
+    document.getElementById('chat-status').innerText = `인식 결과: "${cmd}"`;
+    
+    // HTML 상의 실제 카드 순서대로 이름을 배열로 만듭니다.
+    const cardNames = cards.map(card => card.id.replace('card-', ''));
+    let found = false;
+
+    for (let i = 0; i < cardNames.length; i++) {
+        const name = cardNames[i];
+        if (cleanCmd.includes(name)) {
+            found = true;
+            if (cleanCmd.includes("꿈") || cleanCmd.includes("장래희망")) {
+                updateUI("음성 답변", `${name}의 꿈은 ${friendData[name].dream}입니다.`, friendData[name].pitch);
+            } else if (cleanCmd.includes("단짝") || cleanCmd.includes("친구")) {
+                updateUI("음성 답변", `${name}의 단짝 친구는 ${friendData[name].bestFriend}입니다.`, friendData[name].pitch);
+            } else {
+                // 행(Row)과 열(Column) 계산 보정
+                const row = Math.floor(i / cols) + 1; // 3개씩 끊어서 줄 계산
+                const col = ["왼쪽", "가운데", "오른쪽"][i % cols]; // 나머지로 칸 계산
+                
+                currentIndex = i;
+                cards[currentIndex].focus();
+                cards[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // 안내 텍스트 수정
+                updateUI("위치 안내", `${name} 학생은 ${row}번째 줄 ${col}에 있습니다.`, 1.0);
+            }
+            return;
         }
     }
-
-    function toggleGuide(show) {
-        document.getElementById('guide-overlay').style.display = show ? 'flex' : 'none';
-    }
+    if (!found) speak("누구를 찾으시는지 잘 모르겠어요.", 1.0);
+}
 </script>
 </body>
 </html>
