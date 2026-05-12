@@ -263,6 +263,15 @@ const cols = 3;
 /* --- 음성 및 소리 제어 (개선된 버전) --- */
 let isAudioUnlocked = false;
 
+// 기존 이벤트 리스너 부분에 추가
+window.addEventListener('click', function() {
+    unlockAudio(); // 이미 만드신 unlockAudio 함수 호출
+}, { once: true }); // 단 한 번만 실행
+
+window.addEventListener('keydown', function() {
+    unlockAudio();
+}, { once: true });
+
 // 첫 터치 시 오디오/TTS 잠금을 해제하는 함수
 function unlockAudio() {
     if (isAudioUnlocked) return;
@@ -293,14 +302,25 @@ function speak(text, pitch, onEndCallback) {
         return;
     }
 
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'ko-KR';
-    utter.pitch = pitch || 1.0;
-    utter.rate = 1.0; 
+  // 2. 약간의 시간차(50ms)를 두고 새로운 음성 생성
+    // (브라우저가 cancel 처리를 완료할 시간을 벌어줍니다)
+    setTimeout(() => {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'ko-KR';
+        utter.pitch = pitch || 1.0;
+        utter.rate = 1.0; 
 
-    utter.onend = () => {
-        if (onEndCallback) onEndCallback();
-    };
+        utter.onend = () => {
+            if (onEndCallback) onEndCallback();
+        };
+
+        utter.onerror = (event) => {
+            console.error("TTS 에러 발생:", event);
+        };
+
+        window.speechSynthesis.speak(utter);
+    }, 50); 
+}
 
     // 브라우저가 중단 처리를 완료할 시간을 주기 위해 약간의 지연 후 재생
     setTimeout(() => {
@@ -328,11 +348,20 @@ function playDreamSound(name) {
     const audio = document.getElementById(`audio-${name}`);
     if (audio) {
         currentPlayingAudio = audio;
-        audio.load(); // 모바일 재생 안정성을 위해 로드 추가
-        audio.play().catch((err) => {
-            console.log("재생 실패:", err);
-            speak("소리 재생을 위해 화면을 한 번 더 터치해 주세요.");
-        });
+        
+        // 오디오 객체 초기화
+        audio.pause();
+        audio.currentTime = 0;
+        
+        // 재생 시도 및 예외 처리
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("재생 차단됨:", error);
+                // 사용자가 화면을 클릭하도록 유도
+                speak("소리 재생을 위해 화면을 한 번 클릭해 주세요.");
+            });
+        }
         document.getElementById('message-box').innerText = `${name}의 꿈의 소리를 재생합니다.`;
         document.getElementById('stage-indicator').innerText = "Dreaming";
     }
