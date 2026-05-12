@@ -258,83 +258,20 @@ let currentIndex = -1;
 const cards = Array.from(document.querySelectorAll('.photo-card'));
 const cols = 3;
 
-
-/* --- 음성 및 소리 제어 (모바일 최적화) --- */
-let isAudioUnlocked = false;
-
-// 모바일 브라우저 오디오 잠금 해제 함수
-function unlockAudio() {
-    if (isAudioUnlocked) return;
-    
-    // 빈 음성 재생으로 TTS 잠금 해제
-    const silentUtter = new SpeechSynthesisUtterance("");
-    window.speechSynthesis.speak(silentUtter);
-    
-    // 모든 오디오 엘리먼트 초기화
-    const audios = document.querySelectorAll('audio');
-    audios.forEach(audio => {
-        audio.play().then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-        }).catch(() => {/* 초기 터치 전 차단 방지 */});
-    });
-    
-    isAudioUnlocked = true;
-    console.log("Audio Unlocked");
-}
-
-
 /* --- 음성 및 소리 제어 (단일화된 핵심 함수) --- */
 function speak(text, pitch, onEndCallback) {
-    // 이전 음성 즉시 중단 및 초기화
-    window.speechSynthesis.cancel(); 
-    
-    if (!text) {
-        if (onEndCallback) onEndCallback();
-        return;
-    }
-
+    window.speechSynthesis.cancel(); // 이전 음성 즉시 중단
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'ko-KR';
     utter.pitch = pitch || 1.0;
-    utter.rate = 1.0; // 속도 명시
-
-    utter.onend = () => {
-        if (onEndCallback) onEndCallback();
-    };
-
-    // 약간의 지연을 주어 브라우저가 cancel을 완전히 처리한 후 재생하도록 함
-    setTimeout(() => {
-        window.speechSynthesis.speak(utter);
-    }, 50);
+    if (onEndCallback) utter.onend = onEndCallback;
+    window.speechSynthesis.speak(utter);
 }
 
 function updateUI(stage, text, pitch, onEndCallback) {
     document.getElementById('stage-indicator').innerText = stage;
     document.getElementById('message-box').innerText = text;
     speak(text, pitch, onEndCallback);
-}
-
-function playDreamSound(name) {
-    stopAllAudio();
-    unlockAudio(); // 터치 시점 잠금 해제 확인
-
-    const audio = document.getElementById(`audio-${name}`);
-    if (audio) {
-        currentPlayingAudio = audio;
-        audio.load(); 
-        
-        // play()는 반드시 유저 인터랙션 내부에서 호출되어야 함
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("재생 실패:", error);
-                updateUI("Error", "소리 재생을 위해 화면을 다시 터치해 주세요.", 1.0);
-            });
-        }
-        document.getElementById('message-box').innerText = `${name}의 꿈의 소리를 재생합니다.`;
-        document.getElementById('stage-indicator').innerText = "Dreaming";
-    }
 }
 
 function stopAllAudio() {
@@ -346,7 +283,20 @@ function stopAllAudio() {
     }
 }
 
-
+function playDreamSound(name) {
+    stopAllAudio();
+    const audio = document.getElementById(`audio-${name}`);
+    if (audio) {
+        currentPlayingAudio = audio;
+        audio.load(); // 모바일 재생 안정성을 위해 로드 추가
+        audio.play().catch((err) => {
+            console.log("재생 실패:", err);
+            speak("소리 재생을 위해 화면을 한 번 더 터치해 주세요.");
+        });
+        document.getElementById('message-box').innerText = `${name}의 꿈의 소리를 재생합니다.`;
+        document.getElementById('stage-indicator').innerText = "Dreaming";
+    }
+}
 
 /* --- 게임 로직 --- */
 function executeSingleClickAction(name) {
@@ -399,13 +349,12 @@ cards.forEach((card, index) => {
 
     // 1. 일반 클릭 및 터치 (인사 및 미션)
     card.addEventListener('click', (e) => {
-    unlockAudio(); // 유저 클릭 시 오디오 잠금 해제 실행
         // 롱 프레스가 방금 발생했다면 클릭 동작 무시
         if (isLongPress) {
             isLongPress = false;
             return;
         }
-        executeSingleClickAction(name);
+        
         // 모바일 브라우저 음성 잠금 해제 (User Gesture 대응)
         if (window.speechSynthesis.speaking === false) {
             const silentUtter = new SpeechSynthesisUtterance("");
@@ -415,8 +364,6 @@ cards.forEach((card, index) => {
         executeSingleClickAction(name);
     });
 
-    document.body.addEventListener('touchstart', unlockAudio, { once: true });
-    
     // 2. 더블 클릭 (PC에서 꿈의 소리 재생)
     card.addEventListener('dblclick', () => {
         playDreamSound(name);
