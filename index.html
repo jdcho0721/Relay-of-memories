@@ -258,14 +258,54 @@ let currentIndex = -1;
 const cards = Array.from(document.querySelectorAll('.photo-card'));
 const cols = 3;
 
-/* --- 음성 및 소리 제어 (단일화된 핵심 함수) --- */
+
+
+/* --- 음성 및 소리 제어 (개선된 버전) --- */
+let isAudioUnlocked = false;
+
+// 첫 터치 시 오디오/TTS 잠금을 해제하는 함수
+function unlockAudio() {
+    if (isAudioUnlocked) return;
+
+    // 1. 빈 음성 재생으로 TTS 잠금 해제
+    const silentUtter = new SpeechSynthesisUtterance("");
+    window.speechSynthesis.speak(silentUtter);
+
+    // 2. 모든 오디오 객체를 한 번씩 로드/재생하여 잠금 해제
+    const audios = document.querySelectorAll('audio');
+    audios.forEach(audio => {
+        audio.play().then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+        }).catch(() => { /* 초기화 실패 무시 */ });
+    });
+
+    isAudioUnlocked = true;
+    console.log("모바일 오디오 잠금 해제 완료");
+}
+
+// 기존 speak 함수 수정 (안정성 강화)
 function speak(text, pitch, onEndCallback) {
-    window.speechSynthesis.cancel(); // 이전 음성 즉시 중단
+    window.speechSynthesis.cancel(); // 이전 음성 중지
+    
+    if (!text) {
+        if (onEndCallback) onEndCallback();
+        return;
+    }
+
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'ko-KR';
     utter.pitch = pitch || 1.0;
-    if (onEndCallback) utter.onend = onEndCallback;
-    window.speechSynthesis.speak(utter);
+    utter.rate = 1.0; 
+
+    utter.onend = () => {
+        if (onEndCallback) onEndCallback();
+    };
+
+    // 브라우저가 중단 처리를 완료할 시간을 주기 위해 약간의 지연 후 재생
+    setTimeout(() => {
+        window.speechSynthesis.speak(utter);
+    }, 50);
 }
 
 function updateUI(stage, text, pitch, onEndCallback) {
@@ -348,19 +388,17 @@ cards.forEach((card, index) => {
     let isLongPress = false;
 
     // 1. 일반 클릭 및 터치 (인사 및 미션)
+
+cards.forEach((card, index) => {
+    const name = card.id.replace('card-', '');
+    
     card.addEventListener('click', (e) => {
-        // 롱 프레스가 방금 발생했다면 클릭 동작 무시
+        unlockAudio(); // 클릭 시점에 잠금 해제 시도
+        
         if (isLongPress) {
             isLongPress = false;
             return;
         }
-        
-        // 모바일 브라우저 음성 잠금 해제 (User Gesture 대응)
-        if (window.speechSynthesis.speaking === false) {
-            const silentUtter = new SpeechSynthesisUtterance("");
-            window.speechSynthesis.speak(silentUtter);
-        }
-        
         executeSingleClickAction(name);
     });
 
@@ -397,6 +435,9 @@ cards.forEach((card, index) => {
     card.addEventListener('focus', () => currentIndex = index);
 });
 
+// 문서 전체에 터치 이벤트 추가 (안전 장치)
+document.body.addEventListener('touchstart', unlockAudio, { once: true });
+document.body.addEventListener('click', unlockAudio, { once: true });
 
 document.addEventListener('keydown', (e) => {
     if (currentIndex === -1) { currentIndex = 0; cards[0].focus(); return; }
