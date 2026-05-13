@@ -232,30 +232,36 @@
 
 <script>
 
-// 1. 잠금 해제 및 안내를 담당하는 통합 함수
-   // 1. 오디오 잠금 해제 전용 함수 (안내 메시지 제거)
+
+// 1. 잠금 해제 전용 함수
 function unlockAudio() {
     if (window.isAudioUnlocked) return;
-    window.isAudioUnlocked = true;
-
-    // 오디오 잠금 해제 (실행만 하고 안내 메시지는 내보내지 않음)
+    
+    // 오디오 태그 잠금 해제
     const audios = document.querySelectorAll('audio');
     audios.forEach(audio => {
         audio.play().then(() => {
             audio.pause();
             audio.currentTime = 0;
-        }).catch(e => console.log("잠금 해제 대기 중"));
+        }).catch(e => console.log("오디오 잠금 대기"));
     });
 
-    // 이벤트 리스너 제거
+    // TTS 잠금 해제 (중요: 빈 문장을 즉시 말하게 하여 권한 획득)
+    const unlockUtter = new SpeechSynthesisUtterance("");
+    window.speechSynthesis.speak(unlockUtter);
+    
+    window.isAudioUnlocked = true;
+    
+    // 이벤트 제거
     document.removeEventListener('click', unlockAudio);
     document.removeEventListener('touchstart', unlockAudio);
+    
+    console.log("잠금 해제 완료");
 }
 
-// 2. 이벤트 등록 (사용자가 최초 터치 시 잠금만 해제됨)
-document.addEventListener('click', unlockAudio, { passive: true });
-document.addEventListener('touchstart', unlockAudio, { passive: true });
-
+// 초기화: 첫 터치 시 즉시 실행
+document.addEventListener('touchstart', unlockAudio, { passive: false });
+document.addEventListener('click', unlockAudio, { passive: false });
 /* --- 데이터 설정 --- */
 const friendData = {
     '재형': { role: "운동선수", dream: "멋진 축구선수", bestFriend: "은우", pitch: 0.8, next: "은우" },
