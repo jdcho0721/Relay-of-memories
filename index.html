@@ -230,56 +230,13 @@
     <div id="message-box">추억이 담긴 앨범에서 친구를 선택해 주세요.</div>
 </footer>
 
-<div id="start-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#2c3e50; z-index:9999; display:flex; justify-content:center; align-items:center;">
-    <button id="start-btn" style="padding: 20px 40px; font-size: 2rem; background: var(--gold); border: none; border-radius: 20px; cursor: pointer;">
-        추억의 릴레이 시작하기
-    </button>
-</div>
+
 
 <script>
 
-document.getElementById('start-btn').addEventListener('click', function() {
-    // 1. 오디오 잠금 해제
-    const audios = document.querySelectorAll('audio');
-    audios.forEach(a => { a.play().then(() => a.pause()); });
 
-    // 2. TTS 잠금 해제
-    const startUtter = new SpeechSynthesisUtterance("앨범이 준비되었습니다. 친구를 선택해주세요.");
-    window.speechSynthesis.speak(startUtter);
 
-    // 3. 버튼 제거
-    document.getElementById('start-overlay').style.display = 'none';
-});
 
-// 1. 잠금 해제 전용 함수
-function unlockAudio() {
-    if (window.isAudioUnlocked) return;
-    
-    // 오디오 태그 잠금 해제
-    const audios = document.querySelectorAll('audio');
-    audios.forEach(audio => {
-        audio.play().then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-        }).catch(e => console.log("오디오 잠금 대기"));
-    });
-
-    // TTS 잠금 해제 (중요: 빈 문장을 즉시 말하게 하여 권한 획득)
-    const unlockUtter = new SpeechSynthesisUtterance("");
-    window.speechSynthesis.speak(unlockUtter);
-    
-    window.isAudioUnlocked = true;
-    
-    // 이벤트 제거
-    document.removeEventListener('click', unlockAudio);
-    document.removeEventListener('touchstart', unlockAudio);
-    
-    console.log("잠금 해제 완료");
-}
-
-// 초기화: 첫 터치 시 즉시 실행
-document.addEventListener('touchstart', unlockAudio, { passive: false });
-document.addEventListener('click', unlockAudio, { passive: false });
 /* --- 데이터 설정 --- */
 const friendData = {
     '재형': { role: "운동선수", dream: "멋진 축구선수", bestFriend: "은우", pitch: 0.8, next: "은우" },
@@ -391,27 +348,45 @@ function completeRelay(name) {
 }
 
 /* --- 이벤트 제어 (클릭/터치 및 롱 프레스 통합) --- */
+/* --- 카드 클릭 이벤트 로직 (여기가 소리 잠금 해제의 유일한 관문입니다) --- */
 cards.forEach((card, index) => {
     const name = card.id.replace('card-', '');
     let touchTimer = null;
     let isLongPress = false;
 
-    // 1. 일반 클릭 및 터치 (인사 및 미션)
     card.addEventListener('click', (e) => {
-        // 롱 프레스가 방금 발생했다면 클릭 동작 무시
-        if (isLongPress) {
-            isLongPress = false;
-            return;
-        }
-        
-        // 모바일 브라우저 음성 잠금 해제 (User Gesture 대응)
-        if (window.speechSynthesis.speaking === false) {
-            const silentUtter = new SpeechSynthesisUtterance("");
-            window.speechSynthesis.speak(silentUtter);
+        if (isLongPress) { isLongPress = false; return; }
+
+        // 브라우저의 소리 차단을 우회하는 핵심 로직
+        if (!window.isAudioUnlocked) {
+            // 모든 오디오를 살짝 재생했다 멈춰서 권한 획득
+            const audios = document.querySelectorAll('audio');
+            audios.forEach(a => { 
+                a.play().then(() => a.pause()).catch(err => console.log("재생 오류:", err)); 
+            });
+            
+            // TTS 음성 권한 확보
+            const unlockUtter = new SpeechSynthesisUtterance("준비되었습니다.");
+            unlockUtter.volume = 0; // 초기 권한 획득용은 소리 없이 실행
+            window.speechSynthesis.speak(unlockUtter);
+            
+            window.isAudioUnlocked = true;
+            console.log("잠금 해제 성공");
         }
         
         executeSingleClickAction(name);
     });
+
+    // 롱프레스, 더블클릭 로직은 그대로 유지...
+    card.addEventListener('dblclick', () => playDreamSound(name));
+    card.addEventListener('touchstart', (e) => {
+        isLongPress = false;
+        touchTimer = setTimeout(() => { isLongPress = true; playDreamSound(name); }, 500); 
+    }, { passive: true });
+    card.addEventListener('touchend', () => { if (touchTimer) clearTimeout(touchTimer); });
+    card.addEventListener('touchmove', () => { if (touchTimer) clearTimeout(touchTimer); });
+    card.addEventListener('focus', () => currentIndex = index);
+});
 
     // 2. 더블 클릭 (PC에서 꿈의 소리 재생)
     card.addEventListener('dblclick', () => {
