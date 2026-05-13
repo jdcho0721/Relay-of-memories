@@ -230,8 +230,26 @@
     <div id="message-box">추억이 담긴 앨범에서 친구를 선택해 주세요.</div>
 </footer>
 
+<div id="start-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#2c3e50; z-index:9999; display:flex; justify-content:center; align-items:center;">
+    <button id="start-btn" style="padding: 20px 40px; font-size: 2rem; background: var(--gold); border: none; border-radius: 20px; cursor: pointer;">
+        추억의 릴레이 시작하기
+    </button>
+</div>
+
 <script>
 
+document.getElementById('start-btn').addEventListener('click', function() {
+    // 1. 오디오 잠금 해제
+    const audios = document.querySelectorAll('audio');
+    audios.forEach(a => { a.play().then(() => a.pause()); });
+
+    // 2. TTS 잠금 해제
+    const startUtter = new SpeechSynthesisUtterance("앨범이 준비되었습니다. 친구를 선택해주세요.");
+    window.speechSynthesis.speak(startUtter);
+
+    // 3. 버튼 제거
+    document.getElementById('start-overlay').style.display = 'none';
+});
 
 // 1. 잠금 해제 전용 함수
 function unlockAudio() {
