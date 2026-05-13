@@ -232,45 +232,30 @@
 
 <script>
 
-    
-/* --- 오디오 엔진 강제 활성화 보강 --- */
-/* --- 개선된 오디오 잠금 해제 함수 --- */
+// 1. 잠금 해제 및 안내를 담당하는 통합 함수
+   // 1. 오디오 잠금 해제 전용 함수 (안내 메시지 제거)
 function unlockAudio() {
-    // 1. 웹 오디오 컨텍스트(Web Audio API)를 사용하는 경우의 대비 (필요 시)
-    // 현재는 <audio> 태그를 사용 중이므로 아래 코드가 핵심입니다.
-    
+    if (window.isAudioUnlocked) return;
+    window.isAudioUnlocked = true;
+
+    // 오디오 잠금 해제 (실행만 하고 안내 메시지는 내보내지 않음)
     const audios = document.querySelectorAll('audio');
-    
-    // 첫 클릭 시 모든 오디오를 한 번씩 아주 짧게 재생 후 멈춤
     audios.forEach(audio => {
         audio.play().then(() => {
             audio.pause();
             audio.currentTime = 0;
-            console.log("오디오 잠금 해제 성공");
-        }).catch(e => {
-            console.error("오디오 자동 재생 제한됨", e);
-        });
+        }).catch(e => console.log("잠금 해제 대기 중"));
     });
-    
-    // 이벤트 리스너 제거 (한 번만 실행되도록)
+
+    // 이벤트 리스너 제거
     document.removeEventListener('click', unlockAudio);
     document.removeEventListener('touchstart', unlockAudio);
 }
 
-// document 전체가 아닌, 앨범 컨테이너나 특정 영역에만 거는 것도 방법입니다.
-document.addEventListener('touchstart', unlockAudio, { once: true });
-    
-    
-    
-    // 안내 음성 (잠금이 풀렸음을 확인)
-    setTimeout(() => {
-        speak("앨범이 준비되었습니다. 친구를 선택해주세요.", 1.0);
-    }, 100);
-}
+// 2. 이벤트 등록 (사용자가 최초 터치 시 잠금만 해제됨)
+document.addEventListener('click', unlockAudio, { passive: true });
+document.addEventListener('touchstart', unlockAudio, { passive: true });
 
-// 사용자가 화면 아무 곳이나 누를 때 실행
-document.addEventListener('click', unlockAudio);
-document.addEventListener('touchstart', unlockAudio);
 /* --- 데이터 설정 --- */
 const friendData = {
     '재형': { role: "운동선수", dream: "멋진 축구선수", bestFriend: "은우", pitch: 0.8, next: "은우" },
