@@ -5,38 +5,44 @@
     <title>전북맹아학교: 추억의 릴레이</title>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Pretendard:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --frame: #8d6e63; 
-            --gold: #ffd700; 
-            --accent: #e67e22;
-            --soft-bg: #fff9f0;
-        }
+:root { 
+        --frame: #8d6e63; 
+        --gold: #ffd700; 
+        --accent: #e67e22;
+        --soft-bg: #fff9f0;
+    }
         
-        body { 
-            margin: 0; background: #2c3e50; color: #333;
-            font-family: 'Pretendard', sans-serif; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; 
-        }
+body { 
+        margin: 0; background: #2c3e50; color: #333;
+        font-family: 'Pretendard', sans-serif; 
+        display: flex; flex-direction: column; align-items: center; 
+        min-height: 100vh;
+        /* 핵심 수정: 중앙 고정을 풀고 스크롤을 허용합니다 */
+        padding: 20px 10px;
+        overflow-y: auto; 
+        box-sizing: border-box;
+    }
 
-        .game-title {
-            font-family: 'Gowun Batang', serif;
-            font-size: 2.8rem;
-            color: var(--gold);
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            text-align: center;
-            letter-spacing: 2px;
-        }
+  .game-title {
+        font-family: 'Gowun Batang', serif;
+        /* 핵심 수정: 화면 크기에 따라 폰트 크기가 자동 조절됩니다 */
+        font-size: clamp(1.8rem, 5vw, 2.8rem);
+        color: var(--gold);
+        margin: 20px 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        text-align: center;
+    }
 
-        #guide-btn {
-            position: absolute; top: 25px; left: 25px;
-            padding: 12px 24px; 
-            background: linear-gradient(135deg, #8d6e63, #5d4037);
-            color: white; border: none; border-radius: 50px; cursor: pointer;
-            font-family: 'Gowun Batang', serif; font-weight: bold; font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.3s;
-            z-index: 100;
-        }
+/* 가이드 버튼을 모바일에서도 누르기 쉬운 위치로 조정 */
+    #guide-btn {
+        position: relative; top: 0; left: 0;
+        margin-bottom: 15px;
+        padding: 10px 24px; 
+        background: linear-gradient(135deg, #8d6e63, #5d4037);
+        color: white; border: none; border-radius: 50px; cursor: pointer;
+        font-family: 'Gowun Batang', serif; font-weight: bold;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
 
         #guide-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -81,12 +87,12 @@
         #author-section h3 { font-size: 1.1rem; color: #8d6e63; margin-bottom: 10px; }
         .author-info { font-size: 1rem; color: #6d4c41; line-height: 1.6; }
 
-        #album-frame { padding: 25px; background: #4a3e36; border-radius: 20px; box-shadow: 0 40px 80px rgba(0,0,0,0.6); }
-        #album-container {
-            width: 950px; height: 580px; border: 15px solid var(--frame); background: #fff;
-            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr);
-            padding: 40px; gap: 30px; border-radius: 10px;
-        }
+#album-frame { 
+        width: 100%; max-width: 980px;
+        padding: 15px; background: #4a3e36; border-radius: 20px; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        box-sizing: border-box;
+    }
         
         .photo-card {
             background: #fff; border: 1px solid #eee; border-radius: 10px;
@@ -102,11 +108,24 @@
             z-index: 10;
         }
 
-        .photo-card.target { border: 5px solid var(--gold); animation: blink 1s infinite; background: #fffdf0; }
+        .photo-card {
+        background: #fff; border: 1px solid #eee; border-radius: 10px;
+        display: flex; flex-direction: column; align-items: center;
+        cursor: pointer; transition: 0.3s; padding: 15px;
+    }
         
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
         
-        .character-img { width: 160px; height: 160px; border-radius: 10px; background-size: cover; background-position: center; border: 1px solid #f5f5f5; }
+           .character-img { 
+        width: 100%; max-width: 160px; aspect-ratio: 1/1; 
+        border-radius: 10px; background-size: cover; background-position: center; 
+    }
+
+@media (min-width: 600px) {
+        #info-panel { flex-direction: row; text-align: right; }
+    }
+
+        
         #img-재형 { background-image: url('재형.png'); }
         #img-은우 { background-image: url('은우.png'); }
         #img-혜란 { background-image: url('혜란.png'); }
@@ -116,20 +135,25 @@
 
         .name-tag { margin-top: 15px; font-weight: bold; font-size: 1.4rem; color: #4a3e36; font-family: 'Gowun Batang', serif; }
         
-        #info-panel {
-            margin-top: 30px; width: 950px; display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 30px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; color: white;
-            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
-        }
+#info-panel {
+        margin-top: 20px; width: 100%; max-width: 950px; 
+        display: flex; flex-direction: column; /* 모바일은 세로로 배치 */
+        gap: 10px; padding: 15px; 
+        background: rgba(255, 255, 255, 0.1); border-radius: 20px; color: white;
+        backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+        box-sizing: border-box; text-align: center;
+    }
         #stage-indicator { font-size: 1.1rem; color: var(--gold); font-weight: bold; }
         #message-box { font-size: 1.3rem; font-family: 'Gowun Batang', serif; color: #fff; text-align: right; flex: 1; margin-left: 20px; }
         
-        .chatbot-header {
-            width: 800px; background: #1A362D; border: 2px solid var(--gold);
-            border-radius: 15px; padding: 15px 25px; margin-bottom: 20px;
-            display: flex; align-items: center; gap: 20px; color: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
+ /* 챗봇 UI 반응형 처리 */
+    .chatbot-header {
+        width: 100%; max-width: 800px;
+        background: #1A362D; border: 2px solid var(--gold);
+        border-radius: 15px; padding: 15px; margin-bottom: 20px;
+        display: flex; align-items: center; gap: 15px; color: #fff;
+        box-sizing: border-box;
+    }
         .mic-section { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .mic-btn {
             width: 50px; height: 50px; background: rgba(212, 175, 55, 0.2);
@@ -196,6 +220,19 @@
     <audio id="audio-소연" src="소연m.mp3" preload="auto"></audio>
 </div>
 
+#album-container {
+        width: 100%;
+        height: auto; /* 핵심 수정: 고정 높이 580px 삭제 */
+        border: 10px solid var(--frame); background: #fff;
+        display: grid; 
+        /* 핵심 수정: 화면 폭이 좁아지면 자동으로 열 개수를 줄입니다 */
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+        padding: 20px; gap: 20px; border-radius: 10px;
+        box-sizing: border-box;
+    }
+
+ 
+
 <main id="album-frame">
     <div id="album-container" role="list">
         <div class="photo-card" id="card-재형" role="button" tabindex="0">
@@ -224,6 +261,8 @@
         </div>
     </div>
 </main>
+
+
 
 <footer id="info-panel">
     <div id="stage-indicator">Waiting</div>
@@ -258,29 +297,50 @@ let currentIndex = -1;
 const cards = Array.from(document.querySelectorAll('.photo-card'));
 const cols = 3;
 
-/* --- 음성 및 소리 제어 (안정화 버전) --- */
-function speak(text, pitch, onEndCallback) {
-    // 1. 이전 음성을 즉시 중단하고 대기열을 비웁니다.
-    window.speechSynthesis.cancel(); 
-    
-    if (!text) {
-        if (onEndCallback) onEndCallback();
-        return;
-    }
-
-    // 2. 브라우저가 정지 신호를 처리할 수 있도록 0.1초의 여유를 줍니다.
-    setTimeout(() => {
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'ko-KR';
-        utter.pitch = pitch || 1.0;
-        utter.rate = 1.0; 
-
-        if (onEndCallback) {
-            utter.onend = onEndCallback;
-        }
-
+/* --- 음성 엔진 활성화 (가장 상단에 추가) --- */
+function unlockAudio() {
+    // 1. TTS 잠금 해제
+    if (window.speechSynthesis) {
+        const utter = new SpeechSynthesisUtterance("");
         window.speechSynthesis.speak(utter);
-    }, 100); 
+    }
+    // 2. 오디오 엘리먼트 잠금 해제
+    const audios = document.querySelectorAll('audio');
+    audios.forEach(audio => {
+        audio.play().then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+        }).catch(() => {/* 초기 무시 */});
+    });
+    
+    // 한 번 실행 후 이벤트 제거
+    document.removeEventListener('touchstart', unlockAudio);
+    document.removeEventListener('click', unlockAudio);
+}
+
+// 사용자가 화면을 건드리는 순간 오디오 엔진을 깨웁니다.
+document.addEventListener('touchstart', unlockAudio);
+document.addEventListener('click', unlockAudio);
+
+
+
+/* --- 음성 및 소리 제어 (단일화된 핵심 함수) --- */
+function speak(text, pitch, onEndCallback) {
+    if (!window.speechSynthesis) return;
+    
+    window.speechSynthesis.cancel(); // 큐에 쌓인 이전 음성 모두 삭제
+    
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ko-KR';
+    utter.pitch = pitch || 1.0;
+    utter.rate = 1.0; // 속도 명시
+
+    // iOS 사파리에서 음성이 끊기는 현상 방지
+    utter.onend = () => {
+        if (onEndCallback) onEndCallback();
+    };
+
+    window.speechSynthesis.speak(utter);
 }
 
 function updateUI(stage, text, pitch, onEndCallback) {
@@ -303,13 +363,18 @@ function playDreamSound(name) {
     const audio = document.getElementById(`audio-${name}`);
     if (audio) {
         currentPlayingAudio = audio;
-        audio.load(); // 모바일 재생 안정성을 위해 로드 추가
-        audio.play().catch((err) => {
-            console.log("재생 실패:", err);
-            speak("소리 재생을 위해 화면을 한 번 더 터치해 주세요.");
-        });
-        document.getElementById('message-box').innerText = `${name}의 꿈의 소리를 재생합니다.`;
-        document.getElementById('stage-indicator').innerText = "Dreaming";
+        // 모바일은 play()가 Promise를 반환하므로 에러 처리가 중요합니다.
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                document.getElementById('message-box').innerText = `${name}의 꿈의 소리를 재생합니다.`;
+                document.getElementById('stage-indicator').innerText = "Dreaming";
+            }).catch(err => {
+                console.error("재생 실패:", err);
+                // 오디오 재생 실패 시 TTS로 안내
+                speak(`${name}의 꿈의 소리를 재생할 수 없습니다. 화면을 다시 터치해 주세요.`);
+            });
+        }
     }
 }
 
@@ -393,11 +458,6 @@ cards.forEach((card, index) => {
             playDreamSound(name);
         }, 500); 
     }, { passive: true });
-
-    window.addEventListener('click', () => {
-    const silentUtter = new SpeechSynthesisUtterance("");
-    window.speechSynthesis.speak(silentUtter);
-}, { once: true });
 
     card.addEventListener('touchend', () => {
         if (touchTimer) {
