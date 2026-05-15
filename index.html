@@ -143,8 +143,23 @@
         @keyframes wave-anim { 0%, 100% { height: 5px; } 50% { height: 20px; } }
         #chat-status { font-size: 1.1rem; color: var(--soft-bg); flex: 1; }
     </style>
+
+    <link rel="manifest" href="manifest.json">
+    
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service Worker 등록 완료:', reg))
+          .catch(err => console.log('Service Worker 등록 실패:', err));
+      });
+    }
+  </script>
 </head>
+
 <body>
+
+    <audio id="bgm-player" src="Sunlight_on_the_Classroom_Floor.mp3" loop preload="auto"></audio>
 
 <header role="banner">
     <h1 class="game-title">추억의 릴레이</h1>
@@ -163,6 +178,9 @@
         </div>
         <div id="chat-status">"민수를 찾아줘"라고 말해보세요.</div>
     </div>
+
+
+
 </header>
 
 <div id="guide-overlay" onclick="toggleGuide(false)">
@@ -232,39 +250,50 @@
 
 <script>
 
-    let isAudioUnlocked = false;
-/* --- 오디오 엔진 강제 활성화 보강 --- */
-function unlockAudio(e) {
+// 1. 오디오 컨텍스트 및 변수 초기화
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let isAudioUnlocked = false;
+
+// 2. 통합 해제 함수
+function unlockAudio() {
     if (isAudioUnlocked) return;
-    
-    // 1. TTS 잠금 해제
+
+    // TTS 잠금 해제 (반드시 필요)
     const silentUtter = new SpeechSynthesisUtterance("");
     window.speechSynthesis.speak(silentUtter);
 
-    // 2. 오디오 로드 및 무음 재생
-    const audios = document.querySelectorAll('audio');
+    // BGM 재생
+    const bgm = document.getElementById('bgm-player');
+    if (bgm) {
+        bgm.volume = 0.3;
+        bgm.play().then(() => {
+            console.log("BGM 재생 성공");
+        }).catch(err => {
+            console.error("BGM 재생 실패:", err);
+            // 만약 여기서 실패한다면 파일 경로를 다시 확인해야 합니다.
+        });
+    }
+
+    // 기타 효과음 프리로드
+    const audios = document.querySelectorAll('audio:not(#bgm-player)');
     audios.forEach(audio => {
         audio.load();
-        audio.play().then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-        }).catch(e => console.log("잠금 해제 대기"));
     });
-    
+
     isAudioUnlocked = true;
-    
-    
 }
 
-// 화면 클릭/터치 시 1회성 잠금 해제만 수행
-document.addEventListener('click', (e) => {
-    if (!isAudioUnlocked) {
-        unlockAudio(e);
-        e.preventDefault(); // 첫 클릭 시 로직이 겹치지 않게 방어
-        return;
+// 3. 메인 클릭 리스너 (딱 한 번만 실행)
+window.addEventListener('click', () => {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+            console.log("AudioContext 활성화됨");
+            unlockAudio(); // 여기서 통합 해제 함수 호출
+        });
+    } else {
+        unlockAudio(); // 상태가 suspended가 아니더라도 호출
     }
-});
-    
+}, { once: true });
  
 /* --- 데이터 설정 --- */
 const friendData = {
