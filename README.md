@@ -87,7 +87,7 @@ teacher's photo plays their story through narration and video.
 
 ## 제작
 
-| Exhibition Creator & Multisensory Interaction Director | **조준동 (Cho Jundong)** | 성균관대학교 정보통신대학 명예교수 · Humartology Lab 설립자 |
+조준동 (Cho Jundong) | 성균관대학교 정보통신대학 명예교수 · Humartology Lab 설립자 |
 
 ✉ jdcho@skku.edu · 🌐 [blog.naver.com/humartology](https://blog.naver.com/humartology)
 
