@@ -91,10 +91,6 @@ teacher's photo plays their story through narration and video.
 
 ✉ jdcho@skku.edu · 🌐 [blog.naver.com/humartology](https://blog.naver.com/humartology)
 
-## 도와주신분
-
-| Virtual Archaeology & Tactile Production Director | **김호용** | (주)위프코 대표 |
-| Accessibility Consultant & Barrier-Free Supervisor | **육근해** | 장애인문화복지연구소 대표 |
 
 ## 라이선스 / License
 
